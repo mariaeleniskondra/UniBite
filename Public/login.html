@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Σύνδεση - UniBite</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
@@ -13,11 +13,10 @@
 
 <div class="container-fluid p-0">
     <div class="row g-0">
-        
-        <!-- ===== ΑΡΙΣΤΕΡΟ ΜΕΡΟΣ: Πληροφορίες UniBite ===== -->
+
         <div class="col-12 col-lg-6 left-pane">
             <div class="pe-lg-5">
-                
+
                 <div class="custom-badge mb-4">• Φοιτητικό Food Sharing</div>
 
                 <h1 class="main-heading" style="font-size: 4rem;">
@@ -28,7 +27,6 @@
                     Μοιράσου τις περισσευούμενες μερίδες σου με συμφοιτητές και κέρδισε πόντους.
                 </p>
 
-                <!-- Στατιστικά -->
                 <div class="d-flex mb-5 text-center">
                     <div class="pe-3 pe-md-4 stats-divider">
                         <p class="stat-number">247</p>
@@ -44,7 +42,6 @@
                     </div>
                 </div>
 
-                <!-- Δείγματα αγγελιών -->
                 <div class="mini-card">
                     <div class="d-flex align-items-center gap-3">
                         <div class="fs-3">🥘</div>
@@ -70,55 +67,37 @@
             </div>
         </div>
 
-        <!-- ===== ΔΕΞΙ ΜΕΡΟΣ: Φόρμες Σύνδεσης / Εγγραφής ===== -->
         <div class="col-12 col-lg-6 right-pane">
             <div class="login-wrapper">
-                
-                <!-- Tabs: Σύνδεση / Εγγραφή -->
+
                 <div class="toggle-container">
-                    <!-- Όταν πατηθεί το tab, καλείται η showTab() -->
                     <div class="toggle-btn active" onclick="showTab('login')">Σύνδεση</div>
                     <div class="toggle-btn" onclick="showTab('register')">Εγγραφή</div>
                 </div>
 
-                <!-- ===== ΦΟΡΜΑ ΣΥΝΔΕΣΗΣ ===== -->
-                <!-- id="loginForm" για να τη βρίσκει το JavaScript -->
                 <div id="loginForm">
                     <h2 class="fw-bold mb-1">Καλώς ήρθες πίσω</h2>
                     <p class="text-muted mb-4">Συνδέσου για να δεις τις αγγελίες</p>
 
-                    <!-- 
-                        ΠΡΟΣΟΧΗ: Δεν έχουμε action="..." γιατί δεν κάνουμε
-                        παραδοσιακό submit. Το JavaScript αναλαμβάνει με fetch().
-                        Το id="loginFormEl" χρησιμοποιείται από το addEventListener.
-                    -->
                     <form id="loginFormEl">
                         <div class="mb-3">
                             <label class="form-label">Email πανεπιστημίου</label>
-                            <!-- id="loginEmail" για να παίρνουμε την τιμή με JS -->
-                            <input type="email" id="loginEmail" class="form-control" 
+                            <input type="email" id="loginEmail" class="form-control"
                                    placeholder="p21xxxxx@upatras.gr" required>
                         </div>
-                        
+
                         <div class="mb-4">
                             <label class="form-label">Κωδικός</label>
-                            <!-- id="loginPassword" για να παίρνουμε την τιμή με JS -->
-                            <input type="password" id="loginPassword" class="form-control" 
+                            <input type="password" id="loginPassword" class="form-control"
                                    placeholder="••••••••" required>
                         </div>
 
-                        <!-- Μήνυμα λάθους — αρχικά κρυμμένο -->
                         <div id="loginError" class="alert alert-danger d-none"></div>
 
                         <button type="submit" class="btn-submit">Σύνδεση</button>
                     </form>
                 </div>
 
-                <!-- ===== ΦΟΡΜΑ ΕΓΓΡΑΦΗΣ ===== -->
-                <!-- 
-                    d-none = κρυμμένο αρχικά (Bootstrap class).
-                    Εμφανίζεται όταν ο χρήστης πατήσει το tab "Εγγραφή"
-                -->
                 <div id="registerForm" class="d-none">
                     <h2 class="fw-bold mb-1">Δημιουργία λογαριασμού</h2>
                     <p class="text-muted mb-4">Ξεκίνα με 5 δωρεάν πόντους!</p>
@@ -127,51 +106,35 @@
                         <div class="row">
                             <div class="col-6 mb-3">
                                 <label class="form-label">Όνομα</label>
-                                <input type="text" id="regFirstName" class="form-control" 
+                                <input type="text" id="regFirstName" class="form-control"
                                        placeholder="Μαρία" required>
                             </div>
                             <div class="col-6 mb-3">
                                 <label class="form-label">Επώνυμο</label>
-                                <input type="text" id="regLastName" class="form-control" 
+                                <input type="text" id="regLastName" class="form-control"
                                        placeholder="Παπαδοπούλου" required>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Email πανεπιστημίου</label>
-                            <input type="email" id="regEmail" class="form-control" 
+                            <input type="email" id="regEmail" class="form-control"
                                    placeholder="p21xxxxx@upatras.gr" required>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label class="form-label">Κωδικός</label>
-                            <input type="password" id="regPassword" class="form-control" 
+                            <input type="password" id="regPassword" class="form-control"
                                    placeholder="••••••••" required>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="form-label">Ρόλος</label>
-                            <!-- 
-                                Ο χρήστης επιλέγει αν είναι μάγειρας ή καταναλωτής.
-                                Ο admin δημιουργείται μόνο χειροκίνητα στη ΒΔ.
-                            -->
-                            <select id="regRole" class="form-select" required>
-                                <option value="">Επίλεξε ρόλο...</option>
-                                <option value="cook">Μάγειρας (Πάροχος)</option>
-                                <option value="consumer">Καταναλωτής (Δέκτης)</option>
-                            </select>
-                        </div>
-
-                        <!-- Μήνυμα λάθους εγγραφής — αρχικά κρυμμένο -->
                         <div id="registerError" class="alert alert-danger d-none"></div>
-                        <!-- Μήνυμα επιτυχίας εγγραφής — αρχικά κρυμμένο -->
                         <div id="registerSuccess" class="alert alert-success d-none"></div>
 
                         <button type="submit" class="btn-submit">Εγγραφή</button>
                     </form>
                 </div>
 
-                <!-- Πληροφορία για τους πόντους -->
                 <div class="info-box mt-4">
                     <div>ℹ️</div>
                     <div>Οι νέοι χρήστες ξεκινούν με <strong>5 πόντους</strong> για να κάνουν το πρώτο τους αίτημα!</div>
@@ -183,14 +146,6 @@
     </div>
 </div>
 
-<!-- 
-    Το auth.js περιέχει όλη τη λογική JavaScript:
-    - Εναλλαγή tabs (showTab)
-    - fetch() για login
-    - fetch() για register
-    - Αποθήκευση token στο localStorage
-    - Redirect ανάλογα με τον ρόλο
--->
 <script src="js/auth.js"></script>
 
 </body>
