@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Το Προφίλ μου - UniBite</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav class="unibite-nav">
+        <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="brand">UniBite</div>
+            <div class="nav-actions">
+                <a href="feed.html" class="nav-btn text-decoration-none">Feed</a>
+                <a href="add_listing.html" class="nav-btn text-decoration-none">Δώσε Φαγητό</a>
+                <a href="profile.html" class="nav-btn active text-decoration-none">Προφίλ</a>
+                <a href="login.html" class="nav-btn text-decoration-none">Αποσύνδεση</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-area">
+        
+        <div class="profile-header-card mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-light rounded-circle d-flex justify-content-center align-items-center" style="width: 70px; height: 70px; font-size: 2rem; border: 2px solid var(--purple);">
+                    🎓
+                </div>
+                <div>
+                    <h3 class="fw-bold mb-1" style="color: var(--deep-purple);">p21xxxxx@upatras.gr</h3>
+                    <span class="badge" style="background: var(--light-purple); color: var(--deep-purple);">Ενεργός Φοιτητής</span>
+                </div>
+            </div>
+            <div class="text-center bg-light p-3 rounded-4 border">
+                <h6 class="text-muted mb-1 fw-bold">Διαθέσιμοι Πόντοι</h6>
+                <h2 class="fw-bold mb-0" style="color: var(--purple);">5 🪙</h2>
+            </div>
+        </div>
+
+        <ul class="nav nav-pills mb-4 custom-tabs" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active w-100" id="cook-tab" data-bs-toggle="pill" data-bs-target="#cook" type="button" role="tab">
+                    👨‍🍳 Οι Αγγελίες μου (Μάγειρας)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link w-100" id="consumer-tab" data-bs-toggle="pill" data-bs-target="#consumer" type="button" role="tab">
+                    🍽️ Οι Κρατήσεις μου (Καταναλωτής)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="profileTabsContent">
+            
+            <div class="tab-pane fade show active" id="cook" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-12 col-lg-8 mx-auto">
+                        
+                        <div class="meal-card position-relative">
+                            <div class="position-absolute top-0 end-0 p-3 d-flex gap-2">
+                                <a href="edit_listing.html" class="btn btn-sm btn-outline-secondary" title="Επεξεργασία">✏️</a>
+                                <button class="btn btn-sm btn-outline-danger" title="Διαγραφή" data-bs-toggle="modal" data-bs-target="#deleteModal">🗑️</button>
+                            </div>
+                            
+                            <div class="card-top mb-2">
+                                <span class="status active">Ενεργή</span>
+                            </div>
+                            <h4 class="meal-title mt-0">Μουσακάς με μελιτζάνα</h4>
+                            <p class="small text-muted mb-3">Προσφέρθηκαν: 3 μερίδες | Διαθέσιμες: 2</p>
+                            
+                            <div class="request-box mt-3">
+                                <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                                    <span class="badge bg-danger rounded-pill">1</span> Εκκρεμές Αίτημα
+                                </h6>
+                                
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 border-bottom pb-2 mb-2">
+                                    <div>
+                                        <span class="fw-bold">Μαρία (p210089)</span><br>
+                                        <small class="text-muted">Ζήτησε 1 μερίδα</small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-success fw-bold text-white">Αποδοχή</button>
+                                        <button class="btn btn-sm btn-danger fw-bold text-white">Απόρριψη</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="consumer" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-12 col-lg-8 mx-auto">
+                        
+                        <div class="meal-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h4 class="meal-title mt-0">Φακές σούπα</h4>
+                                <span class="badge bg-success">Εγκρίθηκε!</span>
+                            </div>
+                            <p class="text-muted small mb-3">Από: Νίκος (Εστία Α') · Παραλαβή: 13:00 - 14:00</p>
+                            
+                            <div class="rating-box text-center mt-3 p-3">
+                                <h6 class="fw-bold mb-1">Παρέλαβες το φαγητό;</h6>
+                                <p class="small text-muted mb-2">Αξιολόγησε τον μάγειρα για να κλείσει η συναλλαγή.</p>
+                                
+                                <div class="fs-4 mb-3" style="cursor: pointer;">
+                                    ⭐ ⭐ ⭐ ⭐ <span style="opacity: 0.3;">⭐</span>
+                                </div>
+                                <button class="btn filter-btn w-100">Υποβολή Αξιολόγησης</button>
+                            </div>
+                            
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div> </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none;">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold text-danger">Διαγραφή Αγγελίας</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-muted">
+            Είστε σίγουροι ότι θέλετε να διαγράψετε την αγγελία "Μουσακάς με μελιτζάνα"; Η ενέργεια αυτή δεν μπορεί να αναιρεθεί.
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Ακύρωση</button>
+            <button type="button" class="btn btn-danger fw-bold" data-bs-dismiss="modal">Ναι, διαγραφή</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</body>
+</html>

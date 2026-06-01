@@ -1,0 +1,348 @@
+:root {
+  --purple: #8c5df5;
+  --deep-purple: #4c1db3;
+  --light-purple: #efe6ff;
+  --text: #2b2b2b;
+  --muted: #8a8a8a;
+  --border: #ece9f6;
+  --bg-light: #fafafc;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f6f7fb;
+  color: var(--text);
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* =========================================
+   1. NAVBAR & ΓΕΝΙΚΑ (Feed)
+========================================= */
+.unibite-nav {
+  background: var(--purple);
+  padding: 16px 0;
+}
+.brand {
+  font-family: 'Playfair Display', serif;
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+}
+.nav-actions { display: flex; gap: 10px; }
+.nav-btn {
+  background: transparent;
+  color: #fff;
+  border: 1px solid #d5c7ff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.nav-btn.active {
+  background: #fff;
+  color: var(--purple);
+  border-color: #fff;
+}
+
+.main-area { padding: 40px 0 60px; }
+.page-title { font-size: 36px; color: var(--deep-purple); font-weight: 700; margin: 0; }
+.points-badge {
+  background: #ece8ff; color: var(--deep-purple); padding: 10px 16px;
+  border-radius: 999px; font-weight: 600;
+}
+
+/* =========================================
+   2. ΦΙΛΤΡΑ (Feed)
+========================================= */
+.filter-bar {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+}
+.filter-label {
+  font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px;
+}
+.filter-input, .filter-select {
+  border: 1px solid #e1e1e1; border-radius: 8px; padding: 10px 14px;
+  font-size: 14px; color: var(--text); background: #fff; box-shadow: none;
+}
+.filter-input:focus, .filter-select:focus {
+  border-color: var(--purple); outline: none;
+  box-shadow: 0 0 0 3px var(--light-purple);
+}
+.filter-btn {
+  background: var(--purple); color: #fff; border: none;
+  padding: 10px 16px; border-radius: 8px; font-weight: 600;
+  height: 45px; transition: background-color 0.2s ease;
+}
+.filter-btn:hover { background: var(--deep-purple); color: #fff; }
+
+/* =========================================
+   3. ΚΑΡΤΕΣ ΓΕΥΜΑΤΩΝ & ΧΑΡΤΗΣ (Feed)
+========================================= */
+.meal-card {
+  background: #fff; border: 1px solid var(--border); border-radius: 16px;
+  padding: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); height: 100%;
+}
+.card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.status { font-size: 13px; padding: 4px 10px; border-radius: 999px; font-weight: 600; }
+.status.active { background: #e6dcff; color: var(--deep-purple); }
+.status.inactive { background: #cfd3d8; color: #6b6f75; }
+.emoji { font-size: 22px; }
+.meal-title { color: var(--purple); font-weight: 700; margin: 6px 0 4px; }
+.meal-meta { font-weight: 600; color: #444; margin-bottom: 10px; }
+.meal-desc { color: #5a5a5a; margin-bottom: 16px; }
+.detail-row { padding: 10px 0; border-top: 1px solid #f0eef7; color: #4b4b4b; }
+.primary-btn {
+  margin-top: 16px; width: 100%; background: var(--purple); color: #fff;
+  border: none; padding: 12px 16px; border-radius: 10px; font-weight: 700;
+}
+.secondary-btn {
+  margin-top: 16px; width: 100%; background: #c9cdd2; color: #fff;
+  border: none; padding: 12px 16px; border-radius: 10px; font-weight: 700;
+}
+.inactive .muted { color: #9aa0a6; }
+
+.map-box {
+  background: #fff; border: 1px solid var(--border); border-radius: 16px;
+  padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); height: 400px;
+}
+.map-placeholder {
+  height: 100%; border-radius: 12px; border: 2px dashed #d6c8ff;
+  display: flex; align-items: center; justify-content: center;
+  color: #7b5bd6; font-weight: 600; background: #f7f2ff;
+}
+
+/* =========================================
+   4. ΣΕΛΙΔΑ ΣΥΝΔΕΣΗΣ (Login)
+========================================= */
+.left-pane {
+  background-color: var(--bg-light); padding: 5rem 10%;
+  min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+}
+.right-pane {
+  background-color: #ffffff; padding: 5rem 10%;
+  min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+}
+.custom-badge {
+  display: inline-block; background: var(--light-purple); color: var(--deep-purple);
+  padding: 8px 16px; border-radius: 999px; font-size: 14px; font-weight: 600; width: fit-content;
+}
+.main-heading { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text); margin-bottom: 1rem; }
+.text-accent { color: var(--purple); }
+.stat-number { font-size: 2rem; font-weight: 700; color: var(--text); margin-bottom: 0; }
+.stats-divider { border-right: 1px solid #e1e1e1; }
+
+.mini-card {
+  background: #fff; border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); max-width: 500px;
+}
+.portion-badge {
+  background: var(--light-purple); color: var(--purple); padding: 4px 10px;
+  border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+
+.login-wrapper { max-width: 400px; width: 100%; margin: 0 auto; }
+.toggle-container { background: var(--bg-light); border-radius: 10px; padding: 4px; display: flex; margin-bottom: 40px; }
+.toggle-btn {
+  flex: 1; text-align: center; padding: 10px 0; border-radius: 8px;
+  font-size: 14px; font-weight: 600; cursor: pointer; color: var(--muted); transition: all 0.3s;
+}
+.toggle-btn.active { background: #fff; color: var(--purple); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+
+.login-wrapper .form-control {
+  background-color: #2d313f; border: 1px solid #2d313f; color: #fff; border-radius: 8px; padding: 12px 16px;
+}
+.login-wrapper .form-control:focus {
+  background-color: #2d313f; border-color: var(--purple); color: #fff;
+  box-shadow: 0 0 0 3px rgba(140, 93, 245, 0.2);
+}
+.login-wrapper .form-control::placeholder { color: #8b92a5; }
+
+.btn-submit {
+  background-color: var(--purple); color: #fff; border: none; padding: 14px;
+  border-radius: 8px; font-weight: 600; width: 100%; transition: background 0.2s;
+}
+.btn-submit:hover { background-color: var(--deep-purple); }
+
+.info-box {
+  background-color: #fff9e6; border: 1px solid #ffe89e; border-radius: 8px;
+  padding: 16px; margin-top: 24px; font-size: 13px; color: #856404; display: flex; gap: 12px; align-items: flex-start;
+}
+
+/* =========================================
+   5. RESPONSIVE MEDIA QUERIES
+========================================= */
+@media (max-width: 991px) {
+  .left-pane, .right-pane {
+    min-height: auto;
+    padding: 3rem 1.5rem;
+  }
+}
+@media (max-width: 768px) {
+  .nav-actions { display: none; /* Κρύβουμε τα κουμπιά σε πολύ μικρές οθόνες για συντομία, θέλει burger menu κανονικά */ }
+  .page-title { font-size: 28px; }
+}
+/* =========================================
+   6. ΟΘΟΝΗ ΑΝΕΒΑΣΜΑΤΟΣ ΑΓΓΕΛΙΑΣ
+========================================= */
+.form-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+/* Κοινό στυλ για Inputs, Selects και Textareas μέσα στη φόρμα */
+.app-input {
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--text);
+  background: #fff;
+  box-shadow: none;
+  transition: all 0.2s;
+}
+
+/* Εφέ όταν ο χρήστης γράφει σε ένα πεδίο (Μωβ χρώματα) */
+.app-input:focus {
+  border-color: var(--purple);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--light-purple);
+}
+
+/* Προσαρμογή των Checkboxes στα χρώματα του UniBite */
+.custom-checkbox:checked {
+  background-color: var(--purple);
+  border-color: var(--purple);
+}
+.custom-checkbox:focus {
+  box-shadow: 0 0 0 3px var(--light-purple);
+  border-color: var(--purple);
+}
+
+/* Μικρή ρύθμιση padding για κινητά μέσα στην κάρτα */
+@media (max-width: 576px) {
+  .form-card {
+    padding: 20px;
+  }
+}
+/* =========================================
+   7. ΠΡΟΦΙΛ - HEADER & TABS
+========================================= */
+.profile-header-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+/* Στυλ για τα Tabs Εναλλαγής */
+.custom-tabs {
+  display: flex;
+  gap: 10px;
+  border: none;
+}
+.custom-tabs .nav-item {
+  flex: 1;
+}
+.custom-tabs .nav-link {
+  background: #fff;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.custom-tabs .nav-link:hover {
+  border-color: #d6c8ff;
+}
+/* Το ενεργό (πατημένο) Tab */
+.custom-tabs .nav-link.active {
+  background: var(--light-purple);
+  color: var(--deep-purple);
+  border-color: var(--purple);
+  box-shadow: none;
+}
+
+/* Ειδικά κουτιά μέσα στις κάρτες (Αιτήματα & Αξιολογήσεις) */
+.request-box, .rating-box {
+  background: #fafafc;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+@media (max-width: 576px) {
+  .custom-tabs {
+    flex-direction: column; /* Στα κινητά τα Tabs μπαίνουν το ένα κάτω από το άλλο */
+  }
+}
+
+/* =========================================
+   8. ADMIN DASHBOARD
+========================================= */
+.admin-stat-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  transition: transform 0.2s ease;
+}
+.admin-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(140, 93, 245, 0.1);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+}
+.bg-purple-light {
+  background-color: var(--light-purple);
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--deep-purple);
+  margin: 0;
+  line-height: 1;
+}
+.stat-label {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 8px 0 0 0;
+}
+
+.admin-panel-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+.leaderboard-list li {
+  transition: background-color 0.2s;
+}
+.leaderboard-list li:hover {
+  background-color: #fff !important;
+  border-color: var(--purple) !important;
+}
