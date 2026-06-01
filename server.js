@@ -11,6 +11,11 @@ app.use(express.json());
 
 // 1. ΠΡΩΤΑ ΔΗΛΩΝΟΥΜΕ ΤΑ API ROUTES
 app.use('/api/auth', require('./routes/auth'));
+// Εισαγωγή του αρχείου routes για τις αγγελίες
+const listingRoutes = require('./routes/listings');
+
+// Σύνδεση του route με το πρόθεμα /api/listings
+app.use('/api/listings', listingRoutes);
 
 // 2. ΜΕΤΑ ΣΕΡΒΙΡΟΥΜΕ ΤΑ ΣΤΑΤΙΚΑ ΑΡΧΕΙΑ (Θωρακισμένο path)
 app.use(express.static(path.join(__dirname, 'Public')));

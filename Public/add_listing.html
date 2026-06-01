@@ -4,105 +4,189 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ανέβασμα Αγγελίας - UniBite</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <nav class="unibite-nav">
-        <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div class="brand">UniBite</div>
-            <div class="nav-actions">
-                <a href="feed.html" class="nav-btn text-decoration-none">Feed</a>
-                <a href="add_listing.html" class="nav-btn active text-decoration-none">Δώσε Φαγητό</a>
-                <a href="profile.html" class="nav-btn text-decoration-none">Προφίλ</a>
-                <a href="login.html" class="nav-btn text-decoration-none">Αποσύνδεση</a>
-            </div>
+<!-- Μπάρα Πλοήγησης -->
+<nav class="unibite-nav">
+    <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="brand">UniBite</div>
+        <div class="nav-actions">
+            <a href="index.html" class="nav-btn text-decoration-none">🛒 Θέλω να Φάω (Feed)</a>
+            <a href="cook_dashboard.html" class="nav-btn text-decoration-none">👨‍🍳 Πίνακας Μάγειρα</a>
+            <a href="add_listing.html" class="nav-btn active text-decoration-none">+ Δώσε Φαγητό</a>
+            <a href="login.html" class="nav-btn text-decoration-none">Αποσύνδεση</a>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <div class="container main-area">
-        <div class="row justify-content-center">
-            
-            <div class="col-12 col-md-10 col-lg-8">
-                
-                <div class="text-center mb-4">
-                    <div class="custom-badge mb-3">Σεφ για μια μέρα 👨‍🍳</div>
-                    <h2 class="page-title mb-2">Ανέβασε το φαγητό σου</h2>
-                    <p class="text-muted">Συμπλήρωσε τα στοιχεία για να μοιραστείς τις μερίδες που σου περίσσεψαν.</p>
-                </div>
+<div class="container main-area mt-4">
+    <div class="row justify-content-center">
 
-                <div class="form-card">
-                    <form action="feed.html">
-                        <div class="row g-4">
-                            
-                            <div class="col-12 col-md-8">
-                                <label class="form-label fw-semibold">Τίτλος Φαγητού *</label>
-                                <input type="text" class="form-control app-input" placeholder="π.χ. Μουσακάς με μελιτζάνα" required>
-                            </div>
+        <div class="col-12 col-md-10 col-lg-8">
 
-                            <div class="col-12 col-md-4">
-                                <label class="form-label fw-semibold">Διαθέσιμες Μερίδες *</label>
-                                <select class="form-select app-input" required>
-                                    <option value="" selected disabled>Επίλεξε...</option>
-                                    <option value="1">1 Μερίδα</option>
-                                    <option value="2">2 Μερίδες</option>
-                                    <option value="3">3 Μερίδες</option>
-                                    <option value="4">4+ Μερίδες</option>
-                                </select>
-                            </div>
+            <div class="text-center mb-4">
+                <div class="custom-badge mb-3">Σεφ για μια μέρα 👨‍🍳</div>
+                <h2 class="page-title mb-2">Ανέβασε το φαγητό σου</h2>
+                <p class="text-muted">Συμπλήρωσε τα στοιχεία για να μοιραστείς τις μερίδες που σου περίσσεψαν.</p>
+            </div>
 
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">Τοποθεσία Παραλαβής *</label>
-                                <input type="text" class="form-control app-input" placeholder="π.χ. Φοιτητική Εστία Β', Δωμάτιο 42" required>
-                            </div>
+            <div class="form-card p-4 shadow-sm bg-white rounded">
+                <!-- Αφαιρέθηκε το action, προστέθηκε id για τη JS -->
+                <form id="addListingForm">
+                    <div class="row g-4">
 
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">Ώρα Παραλαβής *</label>
-                                <input type="text" class="form-control app-input" placeholder="π.χ. 14:00 - 15:00" required>
-                            </div>
+                        <!-- Τίτλος Φαγητού -->
+                        <div class="col-12 col-md-8">
+                            <label for="title" class="form-label fw-semibold">Τίτλος Φαγητού *</label>
+                            <input type="text" id="title" class="form-control app-input" placeholder="π.χ. Μουσακάς με μελιτζάνα" required>
+                        </div>
 
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Περιγραφή / Σημειώσεις</label>
-                                <textarea class="form-control app-input" rows="3" placeholder="π.χ. Έχω δικά μου τάπερ, απλά ελάτε να το πάρετε!"></textarea>
-                            </div>
+                        <!-- Συνολικές Μερίδες -->
+                        <div class="col-12 col-md-4">
+                            <label id="portionsLabel" class="form-label fw-semibold">Διαθέσιμες Μερίδες *</label>
+                            <select id="total_portions" class="form-select app-input" required>
+                                <option value="" selected disabled>Επίλεξε...</option>
+                                <option value="1">1 Μερίδα</option>
+                                <option value="2">2 Μερίδες</option>
+                                <option value="3">3 Μερίδες</option>
+                                <option value="4">4 Μερίδες</option>
+                                <option value="5">5+ Μερίδες</option>
+                            </select>
+                        </div>
 
-                            <div class="col-12">
-                                <label class="form-label fw-semibold mb-3">Αλλεργιογόνα (Προαιρετικό)</label>
-                                <div class="d-flex flex-wrap gap-4">
+                        <!-- Τοποθεσία Παραλαβής -->
+                        <div class="col-12 col-md-6">
+                            <label for="pickup_location" class="form-label fw-semibold">Τοποθεσία Παραλαβής *</label>
+                            <input type="text" id="pickup_location" class="form-control app-input" placeholder="π.χ. Φοιτητική Εστία Β', Δωμάτιο 42" required>
+                        </div>
+
+                        <!-- Ώρα Παραλαβής -->
+                        <div class="col-12 col-md-6">
+                            <label for="pickup_time" class="form-label fw-semibold">Ώρα Παραλαβής *</label>
+                            <input type="text" id="pickup_time" class="form-control app-input" placeholder="π.χ. 14:00 - 15:00" required>
+                        </div>
+
+                        <!-- Περιγραφή / Σημειώσεις -->
+                        <div class="col-12">
+                            <label for="description" class="form-label fw-semibold">Περιγραφή / Σημειώσεις</label>
+                            <textarea id="description" class="form-control app-input" rows="3" placeholder="π.χ. Είναι φρέσκο, μόλις βγήκε από το φούρνο! Παρακαλώ κρατάτε δικό σας τάπερ."></textarea>
+                        </div>
+
+                        <!-- 14 Επίσημα Αλλεργιογόνα βάσει εκφώνησης -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold mb-3">Επισήμανση Αλλεργιογόνων (Αν υπάρχουν) *</label>
+                            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                                <div class="col">
                                     <div class="form-check">
-                                        <input class="form-check-input custom-checkbox" type="checkbox" id="gluten">
-                                        <label class="form-check-label" for="gluten">Γλουτένη</label>
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="1" id="allergen_1">
+                                        <label class="form-check-label" for="allergen_1">Σέλινο (Celery)</label>
                                     </div>
+                                </div>
+                                <div class="col">
                                     <div class="form-check">
-                                        <input class="form-check-input custom-checkbox" type="checkbox" id="milk">
-                                        <label class="form-check-label" for="milk">Γαλακτοκομικά</label>
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="2" id="allergen_2">
+                                        <label class="form-check-label" for="allergen_2">Γλουτένη (Gluten)</label>
                                     </div>
+                                </div>
+                                <div class="col">
                                     <div class="form-check">
-                                        <input class="form-check-input custom-checkbox" type="checkbox" id="nuts">
-                                        <label class="form-check-label" for="nuts">Ξηροί Καρποί</label>
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="3" id="allergen_3">
+                                        <label class="form-check-label" for="allergen_3">Μαλακόστρακα (Crustaceans)</label>
                                     </div>
+                                </div>
+                                <div class="col">
                                     <div class="form-check">
-                                        <input class="form-check-input custom-checkbox" type="checkbox" id="vegan">
-                                        <label class="form-check-label text-success fw-bold" for="vegan">Είναι Vegan 🌱</label>
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="4" id="allergen_4">
+                                        <label class="form-check-label" for="allergen_4">Αυγά (Eggs)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="5" id="allergen_5">
+                                        <label class="form-check-label" for="allergen_5">Ψάρια (Fish)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="6" id="allergen_6">
+                                        <label class="form-check-label" for="allergen_6">Λούπινο (Lupin)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="7" id="allergen_7">
+                                        <label class="form-check-label" for="allergen_7">Γάλα / Λακτόζη (Milk)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="8" id="allergen_8">
+                                        <label class="form-check-label" for="allergen_8">Μαλάκια (Molluscs)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="9" id="allergen_9">
+                                        <label class="form-check-label" for="allergen_9">Σινάπι (Mustard)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="10" id="allergen_10">
+                                        <label class="form-check-label" for="allergen_10">Ξηροί Καρποί (Nuts)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="11" id="allergen_11">
+                                        <label class="form-check-label" for="allergen_11">Αραχίδες (Peanuts)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="12" id="allergen_12">
+                                        <label class="form-check-label" for="allergen_12">Σουσάμι (Sesame)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="13" id="allergen_13">
+                                        <label class="form-check-label" for="allergen_13">Σόγια (Soya)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input allergen-checkbox" type="checkbox" value="14" id="allergen_14">
+                                        <label class="form-check-label" for="allergen_14">Διοξείδιο θείου (Sulphites)</label>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-12 mt-5">
-                                <button type="submit" class="primary-btn w-100 fs-6 py-3">Δημοσίευση Αγγελίας (Κερδίζεις 2 Πόντους)</button>
-                            </div>
-
                         </div>
-                    </form>
-                </div>
 
+                        <!-- Μηνύματα Επιτυχίας / Λάθους -->
+                        <div id="listingError" class="alert alert-danger d-none col-12"></div>
+                        <div id="listingSuccess" class="alert alert-success d-none col-12"></div>
+
+                        <!-- Κουμπί Υποβολής -->
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="primary-btn w-100 fs-6 py-3">Δημοσίευση Αγγελίας 🚀</button>
+                        </div>
+
+                    </div>
+                </form>
             </div>
+
         </div>
     </div>
+</div>
 
+<!-- Το JS αρχείο που θα διαχειρίζεται την υποβολή -->
+<script src="js/add_listing.js"></script>
 </body>
 </html>
