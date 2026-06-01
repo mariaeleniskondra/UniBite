@@ -1,15 +1,21 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
+const path = require('path');
 const app = express();
 
-require('./models/db'); 
+require('./models/db');
 
+app.use(cors());
 app.use(express.json());
-app.use(express.static('Public'));
 
-// Routes (θα τα προσθέτουμε σταδιακά)
-// app.use('/api/auth', require('./routes/auth'));
+// 1. ΠΡΩΤΑ ΔΗΛΩΝΟΥΜΕ ΤΑ API ROUTES
+app.use('/api/auth', require('./routes/auth'));
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server τρέχει στο http://localhost:${process.env.PORT}`);
+// 2. ΜΕΤΑ ΣΕΡΒΙΡΟΥΜΕ ΤΑ ΣΤΑΤΙΚΑ ΑΡΧΕΙΑ (Θωρακισμένο path)
+app.use(express.static(path.join(__dirname, 'Public')));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server τρέχει στο http://localhost:${PORT}`);
 });
