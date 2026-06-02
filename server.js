@@ -23,6 +23,8 @@ app.use(express.static(path.join(__dirname, 'Public')));
 
 // ΚΡΙΣΙΜΗ ΔΙΟΡΘΩΣΗ: Σερβίρισμα του φακέλου των uploads ώστε να φαίνονται οι φωτογραφίες των φαγητών live!
 app.use('/uploads', express.static(path.join(__dirname, 'Public/uploads')));
+//NIKOUUUUUUU
+app.use('/api/admin', require('./routes/admin'));
 
 // ===== 2. ΔΗΛΩΣΗ ΟΛΩΝ ΤΩΝ API ROUTES (Μαζεμένα) =====
 app.use('/api/auth', authRoutes);
