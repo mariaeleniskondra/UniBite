@@ -29,4 +29,10 @@ router.put('/:id/approve', verifyToken, requestsController.approveRequest);
 // Endpoint για Απόρριψη Αιτήματος
 // URL: PUT /api/requests/:id/reject
 router.put('/:id/reject', verifyToken, requestsController.rejectRequest);
+
+// Endpoint για Επιβεβαίωση Παραλαβής
+router.put('/:id/confirm-delivery', verifyToken, requestsController.confirmDelivery);
+
+// Endpoint για Μη Εμφάνιση Καταναλωτή (No-Show)
+router.put('/:id/no-show', verifyToken, requestsController.noShowRequest);
 module.exports = router;

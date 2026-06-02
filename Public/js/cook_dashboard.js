@@ -81,7 +81,7 @@ async function loadCookListings() {
     }
 }
 
-// ===== 2. ΣΥΝΑΡΤΗΣΗ: Φόρτωση Ααιτημάτων Φοιτητών =====
+// ===== 2. ΣΥΝΑΡΤΗΣΗ: Φόρτωση Αιτημάτων Φοιτητών =====
 async function loadCookRequests() {
     const container = document.getElementById('myRequestsContainer');
     const token = localStorage.getItem('token');
@@ -95,36 +95,101 @@ async function loadCookRequests() {
         const requests = await response.json();
 
         if (requests.length === 0) {
-            container.innerHTML = `
-                <div class="text-center py-5 text-muted bg-light rounded">
-                    <p class="m-0">🙌 Δεν υπάρχουν εκκρεμή αιτήματα αυτή τη στιγμή.</p>
-                </div>
-            `;
+            container.innerHTML = `<div class="text-center py-5 text-muted bg-light rounded"><p class="m-0">🙌 Δεν υπάρχουν εκκρεμή αιτήματα ή παραδόσεις.</p></div>`;
             return;
         }
 
         container.innerHTML = '';
         requests.forEach(req => {
             const card = document.createElement('div');
-            card.className = 'card shadow-sm border-start border-warning border-4 mb-3 p-3 bg-white rounded';
-            card.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="fw-bold m-0 text-dark">Ο/Η φοιτητής <span class="text-accent">${req.consumer_name}</span></h6>
-                        <small class="text-muted">Ζήτησε μερίδα από το πιάτο: <strong>${req.listing_title}</strong></small>
+
+            // Διαφορετικό στυλ ανάλογα με το αν εκκρεμεί ή αν έχει εγκριθεί
+            if (req.status === 'pending') {
+                card.className = 'card shadow-sm border-start border-warning border-4 mb-3 p-3 bg-white rounded';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold m-0 text-dark">🙋‍♂️ Αίτημα από: <span class="text-primary">${req.consumer_name}</span></h6>
+                            <small class="text-muted">Πιάτο: <strong>${req.listing_title}</strong></small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-success fw-bold" onclick="handleRequest(${req.request_id}, 'approve')">✓ Έγκριση</button>
+                            <button class="btn btn-sm btn-outline-danger fw-bold" onclick="handleRequest(${req.request_id}, 'reject')">✕</button>
+                        </div>
                     </div>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-success px-2 fw-bold" onclick="handleRequest(${req.request_id}, 'approve')">✓ Έγκριση</button>
-                        <button class="btn btn-sm btn-outline-danger px-2 fw-bold" onclick="handleRequest(${req.request_id}, 'reject')">✕</button>
+                `;
+            } else if (req.status === 'approved') {
+                card.className = 'card shadow-sm border-start border-success border-4 mb-3 p-3 bg-white rounded';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold m-0 text-success">⏳ Εγκεκριμένο (Προς Παραλαβή)</h6>
+                            <small class="text-dark">Ο/Η <strong>${req.consumer_name}</strong> έρχεται για το πιάτο: <strong>${req.listing_title}</strong></small>
+                        </div>
+                        <div class="d-flex flex-column gap-1">
+                            <button class="btn btn-sm btn-primary fw-bold" onclick="deliveryAction(${req.request_id}, 'confirm-delivery')">📦 Παραδόθηκε</button>
+                            <button class="btn btn-sm btn-light text-danger fw-bold border" style="font-size:0.75rem;" onclick="deliveryAction(${req.request_id}, 'no-show')">❌ Δεν ήρθε</button>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
             container.appendChild(card);
         });
 
     } catch (error) {
         console.error('Error loading requests:', error);
         container.innerHTML = '<div class="alert alert-danger">Σφάλμα κατά τη φόρτωση των αιτημάτων.</div>';
+    }
+}
+
+// ===== 3. ΣΥΝΑΡΤΗΣΗ: Μεταφορά στη Σελίδα Επεξεργασίας (Edit) =====
+function editListing(id) { window.location.href = `edit_listing.html?id=${id}`; }
+
+// ===== 4. ΣΥΝΑΡΤΗΣΗ: Διαγραφή Αγγελίας (Soft Delete) =====
+async function deleteListing(id) {
+    if (!confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή την αγγελία;')) return;
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`${API_URL}/api/listings/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        if (response.ok) { alert('Η αγγελία διαγράφηκε επιτυχώς!'); loadCookListings(); } else { alert('Αποτυχία διαγραφής.'); }
+    } catch (error) { alert('Σφάλμα σύνδεσης.'); }
+}
+
+// ===== 5. ΣΥΝΑΡΤΗΣΗ: Διαχείριση Έγκρισης / Απόρριψης Αιτήματος =====
+async function handleRequest(requestId, action) {
+    const token = localStorage.getItem('token');
+    if (!confirm(action === 'approve' ? 'Θέλετε να εγκρίνετε αυτό το αίτημα;' : 'Θέλετε να απορρίψετε αυτό το αίτημα;')) return;
+
+    try {
+        const response = await fetch(`${API_URL}/api/requests/${requestId}/${action}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } });
+        if (response.ok) {
+            alert(action === 'approve' ? 'Το αίτημα εγκρίθηκε! 👍' : 'Το αίτημα απορρίφθηκε.');
+            loadCookListings(); loadCookRequests();
+        } else { alert('Αποτυχία επεξεργασίας αιτήματος.'); }
+    } catch (error) { alert('Σφάλμα σύνδεσης.'); }
+}
+
+// ===== 6. ΣΥΝΑΡΤΗΣΗ: Διαχείριση Παράδοσης / No-Show (Β3) =====
+async function deliveryAction(requestId, endpoint) {
+    const token = localStorage.getItem('token');
+    const msg = endpoint === 'confirm-delivery' ? 'Επιβεβαιώνετε ότι ο φοιτητής παρέλαβε το φαγητό;' : 'Επιβεβαιώνετε ότι ο φοιτητής ΔΕΝ εμφανίστηκε για την παραλαβή;';
+
+    if (!confirm(msg)) return;
+
+    try {
+        const response = await fetch(`${API_URL}/api/requests/${requestId}/${endpoint}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            alert(endpoint === 'confirm-delivery' ? 'Η παράδοση καταγράφηκε! 🎉' : 'Το No-Show καταγράφηκε και οι πόντοι αφαιρέθηκαν.');
+            loadCookListings(); loadCookRequests();
+        } else {
+            alert('Αποτυχία ενημέρωσης κατάστασης παράδοσης.');
+        }
+    } catch (error) {
+        alert('Σφάλμα σύνδεσης με τον server.');
     }
 }
 
