@@ -22,4 +22,11 @@ const verifyToken = (req, res, next) => {
 // Endpoint: GET /api/requests (Λήψη εκκρεμών αιτημάτων για τον μάγειρα)
 router.get('/cook', verifyToken, requestsController.getCookRequests);
 
+// Endpoint για Έγκριση Αιτήματος
+// URL: PUT /api/requests/:id/approve
+router.put('/:id/approve', verifyToken, requestsController.approveRequest);
+
+// Endpoint για Απόρριψη Αιτήματος
+// URL: PUT /api/requests/:id/reject
+router.put('/:id/reject', verifyToken, requestsController.rejectRequest);
 module.exports = router;
