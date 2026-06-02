@@ -14,6 +14,7 @@
 <div class="container-fluid p-0">
     <div class="row g-0">
 
+        <!-- ΑΡΙΣΤΕΡΟ ΠΑΝΕΛ: ΠΛΗΡΟΦΟΡΙΕΣ & LIVE ΣΤΑΤΙΣΤΙΚΑ -->
         <div class="col-12 col-lg-6 left-pane">
             <div class="pe-lg-5">
 
@@ -27,21 +28,23 @@
                     Μοιράσου τις περισσευούμενες μερίδες σου με συμφοιτητές και κέρδισε πόντους.
                 </p>
 
+                <!-- LIVE ΣΤΑΤΙΣΤΙΚΑ (Συνδεδεμένα με το auth.js) -->
                 <div class="d-flex mb-5 text-center">
                     <div class="pe-3 pe-md-4 stats-divider">
-                        <p class="stat-number">247</p>
+                        <p class="stat-number" id="statPortions">...</p>
                         <small class="text-muted">Μερίδες<br>αυτό το μήνα</small>
                     </div>
                     <div class="px-3 px-md-4 stats-divider">
-                        <p class="stat-number">83</p>
+                        <p class="stat-number" id="statUsers">...</p>
                         <small class="text-muted">Ενεργοί<br>φοιτητές</small>
                     </div>
                     <div class="ps-3 ps-md-4">
-                        <p class="stat-number">4.7</p>
+                        <p class="stat-number" id="statRating">...</p>
                         <small class="text-muted">Μέση<br>αξιολόγηση</small>
                     </div>
                 </div>
 
+                <!-- ΔΟΚΙΜΑΣΤΙΚΕΣ ΜΙΝΙ ΚΑΡΤΕΣ Layout -->
                 <div class="mini-card">
                     <div class="d-flex align-items-center gap-3">
                         <div class="fs-3">🥘</div>
@@ -67,14 +70,17 @@
             </div>
         </div>
 
+        <!-- ΔΕΞΙ ΠΑΝΕΛ: ΦΟΡΜΕΣ ΣΥΝΔΕΣΗΣ / ΕΓΓΡΑΦΗΣ -->
         <div class="col-12 col-lg-6 right-pane">
             <div class="login-wrapper">
 
+                <!-- ΚΟΥΜΠΙΑ ΕΝΑΛΛΑΓΗΣ TABS -->
                 <div class="toggle-container">
                     <div class="toggle-btn active" onclick="showTab('login')">Σύνδεση</div>
                     <div class="toggle-btn" onclick="showTab('register')">Εγγραφή</div>
                 </div>
 
+                <!-- ΦΟΡΜΑ ΣΥΝΔΕΣΗΣ (LOGIN) -->
                 <div id="loginForm">
                     <h2 class="fw-bold mb-1">Καλώς ήρθες πίσω</h2>
                     <p class="text-muted mb-4">Συνδέσου για να δεις τις αγγελίες</p>
@@ -98,22 +104,18 @@
                     </form>
                 </div>
 
+                <!-- ΦΟΡΜΑ ΕΓΓΡΑΦΗΣ (REGISTER) - ΔΙΟΡΘΩΜΕΝΗ -->
                 <div id="registerForm" class="d-none">
                     <h2 class="fw-bold mb-1">Δημιουργία λογαριασμού</h2>
                     <p class="text-muted mb-4">Ξεκίνα με 5 δωρεάν πόντους!</p>
 
                     <form id="registerFormEl">
-                        <div class="row">
-                            <div class="col-6 mb-3">
-                                <label class="form-label">Όνομα</label>
-                                <input type="text" id="regFirstName" class="form-control"
-                                       placeholder="Μαρία" required>
-                            </div>
-                            <div class="col-6 mb-3">
-                                <label class="form-label">Επώνυμο</label>
-                                <input type="text" id="regLastName" class="form-control"
-                                       placeholder="Παπαδοπούλου" required>
-                            </div>
+
+                        <!-- Ενιαίο πεδίο Username απόλυτα ευθυγραμμισμένο με το auth.js και τη MySQL -->
+                        <div class="mb-3">
+                            <label class="form-label">Όνομα Χρήστη (Username)</label>
+                            <input type="text" id="regUsername" class="form-control"
+                                   placeholder="e.g. eleni_maria" required>
                         </div>
 
                         <div class="mb-3">
@@ -135,6 +137,7 @@
                     </form>
                 </div>
 
+                <!-- INFO FOOTER -->
                 <div class="info-box mt-4">
                     <div>ℹ️</div>
                     <div>Οι νέοι χρήστες ξεκινούν με <strong>5 πόντους</strong> για να κάνουν το πρώτο τους αίτημα!</div>
@@ -146,6 +149,7 @@
     </div>
 </div>
 
+<!-- Εισαγωγή του αρχείου JavaScript διαχείρισης -->
 <script src="js/auth.js"></script>
 
 </body>
