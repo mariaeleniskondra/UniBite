@@ -1,25 +1,18 @@
 const db = require('../models/db');
 
-// ===== ΔΗΜΙΟΥΡΓΙΑ ΝΕΑΣ ΑΓΓΕΛΙΑΣ (POST) =====
+// ===== 1. ΔΗΜΙΟΥΡΓΙΑ ΝΕΑΣ ΑΓΓΕΛΙΑΣ (POST) =====
 const createListing = (req, res) => {
-    // 1. Παίρνουμε τα δεδομένα του φαγητού από το req.body (που έστειλε η JS)
     const { title, description, total_portions, pickup_location, pickup_time, allergens } = req.body;
-
-    // 2. Παίρνουμε το user_id του μάγειρα από το req.user
-    // (Το req.user θα δημιουργηθεί αυτόματα από το Middleware ελέγχου του JWT Token)
     const cook_id = req.user.user_id;
 
-    // Έλεγχος αν τα υποχρεωτικά πεδία είναι συμπληρωμένα (Βάσει εκφώνησης Β2)
     if (!title || !total_portions || !pickup_location || !pickup_time) {
         return res.status(400).json({ message: 'Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία (*)' });
     }
 
-    // 3. Εισαγωγή της αγγελίας στον πίνακα listings
-    // Οι διαθέσιμες μερίδες (available_portions) στην αρχή ισούνται με τις συνολικές (total_portions)
     const queryListing = `
-    INSERT INTO listings (cook_id, title, description, total_portions, available_portions, pickup_location, pickup_time, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, 'active')
-  `;
+        INSERT INTO listings (cook_id, title, description, total_portions, available_portions, pickup_location, pickup_time, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'active')
+    `;
 
     db.query(
         queryListing,
@@ -30,16 +23,10 @@ const createListing = (req, res) => {
                 return res.status(500).json({ message: 'Σφάλμα κατά την αποθήκευση της αγγελίας' });
             }
 
-            // Παίρνουμε το ID της αγγελίας που μόλις δημιουργήθηκε στη βάση
             const newListingId = result.insertId;
 
-            // 4. Αποθήκευση αλλεργιογόνων (Αν ο μάγειρας επέλεξε κάποια)
-            // Επειδή είναι σχέση Πολλά-προς-Πολλά, πρέπει να γίνουν inserts στον πίνακα 'listing_allergens'
             if (allergens && allergens.length > 0) {
-
-                // Προετοιμάζουμε έναν πίνακα από bulk values, π.χ. [[listing_id, allergen_id_1], [listing_id, allergen_id_2]]
                 const allergenValues = allergens.map(allergenId => [newListingId, allergenId]);
-
                 const queryAllergens = `INSERT INTO listing_allergens (listing_id, allergen_id) VALUES ?`;
 
                 db.query(queryAllergens, [allergenValues], (err) => {
@@ -47,42 +34,117 @@ const createListing = (req, res) => {
                         console.error("MYSQL INSERT ALLERGENS ERROR:", err);
                         return res.status(500).json({ message: 'Η αγγελία δημιουργήθηκε, αλλά απέτυχε η αποθήκευση των αλλεργιογόνων' });
                     }
-                    // Αν όλα πάνε καλά και με τα αλλεργιογόνα
                     return res.status(201).json({ message: 'Η αγγελία και τα αλλεργιογόνα αποθηκεύτηκαν με επιτυχία!' });
                 });
-
             } else {
-                // Αν δεν είχε αλλεργιογόνα, επιστρέφουμε κατευθείαν επιτυχία
                 return res.status(201).json({ message: 'Η αγγελία αποθηκεύτηκαν με επιτυχία (χωρίς αλλεργιογόνα)!' });
             }
         }
     );
 };
 
-// ===== ΛΗΨΗ ΑΓΓΕΛΙΩΝ ΜΟΝΟ ΤΟΥ ΣΥΓΚΕΚΡΙΜΕΝΟΥ ΜΑΓΕΙΡΑ (GET) =====
+// ===== 2. ΛΗΨΗ ΑΓΓΕΛΙΩΝ ΜΟΝΟ ΤΟΥ ΣΥΓΚΕΚΡΙΜΕΝΟΥ ΜΑΓΕΙΡΑ (GET) =====
 const getCookListings = (req, res) => {
-    // Παίρνουμε το ID του μάγειρα από το token (req.user)
     const cook_id = req.user.user_id;
 
-    // Query που φέρνει τις αγγελίες του μάγειρα
-    // Φίλτρο: created_at >= NOW() - INTERVAL 48 HOUR (Βάσει εκφώνησης για το 48ωρο)
     const query = `
-    SELECT *, 
-           (created_at >= NOW() - INTERVAL 48 HOUR) as is_valid
-    FROM listings 
-    WHERE cook_id = ? AND status != 'deleted'
-    ORDER BY created_at DESC
-  `;
+        SELECT *,
+               (created_at >= NOW() - INTERVAL 48 HOUR) as is_valid
+        FROM listings
+        WHERE cook_id = ? AND status != 'deleted'
+        ORDER BY created_at DESC
+    `;
 
     db.query(query, [cook_id], (err, results) => {
         if (err) {
             console.error("MYSQL GET COOK LISTINGS ERROR:", err);
             return res.status(500).json({ message: 'Σφάλμα κατά τη λήψη των αγγελιών σας' });
         }
-
-        // Επιστρέφουμε τις αγγελίες στον μάγειρα
         return res.json(results);
     });
 };
 
-module.exports = { createListing ,getCookListings};
+// ===== 3. ΛΗΨΗ ΜΙΑΣ ΣΥΓΚΕΚΡΙΜΕΝΗΣ ΑΓΓΕΛΙΑΣ ΓΙΑ ΤΟ EDIT (GET) =====
+const getSingleListing = (req, res) => {
+    const listing_id = req.params.id;
+
+    db.query('SELECT * FROM listings WHERE listing_id = ?', [listing_id], (err, results) => {
+        if (err) {
+            console.error("MYSQL GET SINGLE LISTING ERROR:", err);
+            return res.status(500).json({ message: 'Σφάλμα βάσης δεδομένων κατά τη λήψη της αγγελίας' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Η αγγελία δεν βρέθηκε' });
+        }
+
+        const listing = results[0];
+
+        db.query('SELECT allergen_id FROM listing_allergens WHERE listing_id = ?', [listing_id], (err, allergenResults) => {
+            if (err) {
+                console.error("MYSQL GET LISTING ALLERGENS ERROR:", err);
+                return res.status(500).json({ message: 'Σφάλμα κατά τη λήψη των αλλεργιογόνων' });
+            }
+            listing.allergens = allergenResults.map(row => row.allergen_id);
+            return res.json(listing);
+        });
+    });
+};
+
+// ===== 4. ΑΠΟΘΗΚΕΥΣΗ ΤΩΝ ΝΕΩΝ ΑΛΛΑΓΩΝ ΤΟΥ EDIT ΣΤΗ ΜΥSQL (PUT) =====
+const updateListing = (req, res) => {
+    const listing_id = req.params.id;
+    const { title, description, total_portions, pickup_location, pickup_time, allergens } = req.body;
+
+    const queryUpdate = `
+        UPDATE listings
+        SET title = ?, description = ?, total_portions = ?, available_portions = ?, pickup_location = ?, pickup_time = ?
+        WHERE listing_id = ?
+    `;
+
+    db.query(queryUpdate, [title, description, total_portions, total_portions, pickup_location, pickup_time, listing_id], (err) => {
+        if (err) {
+            console.error("MYSQL UPDATE LISTING ERROR:", err);
+            return res.status(500).json({ message: 'Αποτυχία ενημέρωσης της αγγελίας στη βάση' });
+        }
+
+        db.query('DELETE FROM listing_allergens WHERE listing_id = ?', [listing_id], (err) => {
+            if (err) {
+                console.error("MYSQL DELETE OLD ALLERGENS ERROR:", err);
+                return res.status(500).json({ message: 'Σφάλμα κατά την ανανέωση των αλλεργιογόνων' });
+            }
+
+            if (allergens && allergens.length > 0) {
+                const allergenValues = allergens.map(allergenId => [listing_id, allergenId]);
+                db.query('INSERT INTO listing_allergens (listing_id, allergen_id) VALUES ?', [allergenValues], (err) => {
+                    if (err) {
+                        console.error("MYSQL INSERT NEW ALLERGENS ERROR:", err);
+                        return res.status(500).json({ message: 'Σφάλμα κατά την εισαγωγή των νέων αλλεργιογόνων' });
+                    }
+                    return res.json({ message: 'Η αγγελία και τα αλλεργιογόνα ενημερώθηκαν επιτυχώς!' });
+                });
+            } else {
+                return res.json({ message: 'Η αγγελία ενημερώθηκε επιτυχώς (χωρίς αλλεργιογόνα)!' });
+            }
+        });
+    });
+};
+
+// ===== 5. ΔΙΑΓΡΑΦΗ ΑΓΓΕΛΙΑΣ - SOFT DELETE (DELETE) =====
+// Αυτή η συνάρτηση έλειπε και τη βάλαμε στη σωστή της θέση!
+const deleteListing = (req, res) => {
+    const listing_id = req.params.id;
+
+    // Κάνουμε soft delete αλλάζοντας το status σε 'deleted' βάσει επιχειρηματικής λογικής
+    const query = `UPDATE listings SET status = 'deleted' WHERE listing_id = ?`;
+
+    db.query(query, [listing_id], (err, result) => {
+        if (err) {
+            console.error("MYSQL DELETE LISTING ERROR:", err);
+            return res.status(500).json({ message: 'Σφάλμα κατά τη διαγραφή της αγγελίας' });
+        }
+        return res.json({ message: 'Η αγγελία διαγράφηκε με επιτυχία!' });
+    });
+};
+
+// Όλα τα ονόματα εδώ κάτω συμφωνούν πλέον 100% με τις παραπάνω δηλώσεις!
+module.exports = { createListing, getCookListings, deleteListing, getSingleListing, updateListing };

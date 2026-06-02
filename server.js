@@ -4,6 +4,8 @@ const cors = require('cors');
 const path = require('path');
 const app = express();
 
+const requestRoutes = require('./routes/requests');
+
 require('./models/db');
 
 app.use(cors());
@@ -19,6 +21,8 @@ app.use('/api/listings', listingRoutes);
 
 // 2. ΜΕΤΑ ΣΕΡΒΙΡΟΥΜΕ ΤΑ ΣΤΑΤΙΚΑ ΑΡΧΕΙΑ (Θωρακισμένο path)
 app.use(express.static(path.join(__dirname, 'Public')));
+
+app.use('/api/requests', requestRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
