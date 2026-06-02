@@ -37,7 +37,7 @@ const getDashboardStats = (req,res) =>{
             console.error("MySQL Admin Stats Error (Portions):", err);
             return res.status(500).json({ message: 'Σφάλμα κατά τη λήψη των στατιστικών μερίδων' });
         }
-        db.query(topDonorsQuery, (err, donorsResult) => {
+        db.query(topDonorQuery, (err, donorsResult) => {
             if (err) {
                 console.error("MySQL Admin Stats Error (Donors):", err);
                 return res.status(500).json({ message: 'Σφάλμα κατά τη λήψη του leaderboard' });

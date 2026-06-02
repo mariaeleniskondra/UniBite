@@ -1,8 +1,9 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
+
 -- Δημιουργία και χρήση της βάσης unibite (για να κουμπώσει με τον Node.js)
 CREATE DATABASE IF NOT EXISTS unibite CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE unibite;
+USE unibite_db;
 
 -- Καθαρίζουμε τους παλιούς πίνακες για να αποφύγουμε conflicts
 DROP TABLE IF EXISTS ratings;
