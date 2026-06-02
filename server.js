@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const app = express();
-
 require('./models/db');
 
 app.use(cors());
@@ -12,7 +11,7 @@ app.use(express.json());
 // 1. ΠΡΩΤΑ ΔΗΛΩΝΟΥΜΕ ΤΑ API ROUTES
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
-
+app.use('/api/ratings', require('./routes/ratings'));
 // 2. ΜΕΤΑ ΣΕΡΒΙΡΟΥΜΕ ΤΑ ΣΤΑΤΙΚΑ ΑΡΧΕΙΑ (Θωρακισμένο path)
 app.use(express.static(path.join(__dirname, 'Public')));
 
