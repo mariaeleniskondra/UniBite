@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Επεξεργασία Αγγελίας - UniBite</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -26,7 +24,6 @@
 
 <div class="container main-area mt-4">
     <div class="row justify-content-center">
-
         <div class="col-12 col-md-10 col-lg-8">
 
             <div class="text-center mb-4">
@@ -70,8 +67,14 @@
                             <textarea id="description" class="form-control app-input" rows="3"></textarea>
                         </div>
 
+                        <!-- Φωτογραφία Φαγητού (Πριν το κουμπί υποβολής) -->
                         <div class="col-12">
-                            <label class="form-label fw-semibold mb-3">Επισήμανση Αλλεργιογόνων *</label>
+                            <label for="image" class="form-label fw-semibold">Φωτογραφία Φαγητού (Προαιρετικά)</label>
+                            <input type="file" id="image" class="form-control app-input" accept="image/*">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold mb-3">Επισήμανση Αλλεργιογόνων</label>
                             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                                 <div class="col"><div class="form-check"><input class="form-check-input allergen-checkbox" type="checkbox" value="1" id="allergen_1"><label class="form-check-label" for="allergen_1">Σέλινο (Celery)</label></div></div>
                                 <div class="col"><div class="form-check"><input class="form-check-input allergen-checkbox" type="checkbox" value="2" id="allergen_2"><label class="form-check-label" for="allergen_2">Γλουτένη (Gluten)</label></div></div>
@@ -93,10 +96,9 @@
                         <div id="editError" class="alert alert-danger d-none col-12"></div>
                         <div id="editSuccess" class="alert alert-success d-none col-12"></div>
 
-                        <div class="col-12 mt-4">
+                        <div class="col-12 mt-2">
                             <button type="submit" class="primary-btn w-100 fs-6 py-3">Αποθήκευση Αλλαγών 💾</button>
                         </div>
-
                     </div>
                 </form>
             </div>

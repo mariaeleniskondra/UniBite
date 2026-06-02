@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Πίνακας Μάγειρα - UniBite</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -25,26 +23,23 @@
 </nav>
 
 <div class="container main-area mt-5">
-
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-5">
         <div>
             <h2 class="page-title mb-1">Ο Πίνακας Ελέγχου σου</h2>
             <p class="text-muted mb-0">Διαχειρίσου τις αγγελίες σου και τα αιτήματα των συμφοιτητών σου.</p>
         </div>
-        <div class="stats-badge p-3 bg-white rounded shadow-sm text-center">
-            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">Οι Πόντοι σας</small>
-            <span id="cookCredits" class="fs-4 fw-bold text-accent">--</span>
+        <div class="stat-box">
+            <small class="text-muted">ΟΙ ΠΟΝΤΟΙ ΣΑΣ</small>
+            <h3 class="fw-bold text-accent" id="userPoints">--</h3>
         </div>
     </div>
 
     <div class="row g-4">
-
         <div class="col-12 col-lg-7">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold m-0">Οι Αγγελίες μου 🥘</h4>
                 <a href="add_listing.html" class="btn btn-sm btn-outline-primary px-3">+ Νέα Αγγελία</a>
             </div>
-
             <div id="myListingsContainer" class="d-flex flex-column gap-3">
                 <div class="text-center py-4 text-muted">Φόρτωση αγγελιών...</div>
             </div>
@@ -52,12 +47,10 @@
 
         <div class="col-12 col-lg-5">
             <h4 class="fw-bold mb-4">Αιτήματα Φοιτητών 💬</h4>
-
             <div id="myRequestsContainer" class="d-flex flex-column gap-3">
                 <div class="text-center py-4 text-muted">Φόρτωση αιτημάτων...</div>
             </div>
         </div>
-
     </div>
 </div>
 

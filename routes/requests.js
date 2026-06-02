@@ -1,38 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const requestsController = require('../controllers/requestsController');
-const jwt = require('jsonwebtoken');
 
-// Middleware ελέγχου Token (Το ίδιο ακριβώς που βάλαμε και στις αγγελίες)
-const verifyToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+// ΚΡΙΣΙΜΗ ΔΙΟΡΘΩΣΗ: Αντικατάσταση του τοπικού middleware με το κεντρικό
+const { verifyToken } = require('../middleware/authMiddleware');
 
-    if (!token) return res.status(401).json({ message: 'Άρνηση πρόσβασης. Λείπει το token.' });
+// ===== ENDPOINTS ΔΙΑΧΕΙΡΙΣΗΣ ΑΙΤΗΜΑΤΩΝ =====
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'unibite_secret_key_2026');
-        req.user = decoded;
-        next();
-    } catch (error) {
-        return res.status(403).json({ message: 'Μη έγκυρο token.' });
-    }
-};
-
-// Endpoint: GET /api/requests (Λήψη εκκρεμών αιτημάτων για τον μάγειρα)
+// Λήψη εκκρεμών αιτημάτων για τον μάγειρα
 router.get('/cook', verifyToken, requestsController.getCookRequests);
 
-// Endpoint για Έγκριση Αιτήματος
-// URL: PUT /api/requests/:id/approve
+// Έγκριση Αιτήματος
 router.put('/:id/approve', verifyToken, requestsController.approveRequest);
 
-// Endpoint για Απόρριψη Αιτήματος
-// URL: PUT /api/requests/:id/reject
+// Απόρριψη Αιτήματος
 router.put('/:id/reject', verifyToken, requestsController.rejectRequest);
 
-// Endpoint για Επιβεβαίωση Παραλαβής
+// Επιβεβαίωση Παραλαβής
 router.put('/:id/confirm-delivery', verifyToken, requestsController.confirmDelivery);
 
-// Endpoint για Μη Εμφάνιση Καταναλωτή (No-Show)
+// Μη Εμφάνιση Καταναλωτή (No-Show)
 router.put('/:id/no-show', verifyToken, requestsController.noShowRequest);
+
+// ΚΡΙΣΙΜΗ ΔΙΟΡΘΩΣΗ: Προστέθηκε το export για να μην κρασάρει ο server!
 module.exports = router;

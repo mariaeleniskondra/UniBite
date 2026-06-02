@@ -1,6 +1,6 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
--- Δημιουργία και χρήση της βάσης unibite (για να κουμπώσει με τον Node.js)
+-- Δημιουργία και χρήση της βάσης unibite
 CREATE DATABASE IF NOT EXISTS unibite CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE unibite;
 
@@ -14,18 +14,18 @@ DROP TABLE IF EXISTS users;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
--- 1. ΠΙΝΑΚΑΣ ΧΡΗΣΤΩΝ (Με τον ενιαίο ρόλο 'student')
+--  ΠΙΝΑΚΑΣ ΧΡΗΣΤΩΝ
 CREATE TABLE users (
                        user_id INT AUTO_INCREMENT PRIMARY KEY,
                        username VARCHAR(100) NOT NULL UNIQUE, -- Εδώ αποθηκεύεται το 'Όνομα_Επώνυμο'
                        email VARCHAR(100) NOT NULL UNIQUE,
                        password_hash VARCHAR(255) NOT NULL,
                        role ENUM('student', 'admin') DEFAULT 'student', -- Ο ενιαίος ρόλος για όλους τους φοιτητές
-                       credits INT DEFAULT 5, -- [cite: 43] Οι νέοι χρήστες ξεκινούν με 5 πόντους
+                       credits INT DEFAULT 5, --  Οι νέοι χρήστες ξεκινούν με 5 πόντους
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. ΠΙΝΑΚΑΣ ΑΓΓΕΛΙΩΝ
+--  ΠΙΝΑΚΑΣ ΑΓΓΕΛΙΩΝ
 CREATE TABLE listings (
                           listing_id INT AUTO_INCREMENT PRIMARY KEY,
                           cook_id INT NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE listings (
                           total_portions INT NOT NULL,
                           available_portions INT NOT NULL,
                           pickup_location VARCHAR(255) NOT NULL,
-                          latitude DECIMAL(10, 8) DEFAULT NULL,
+                          latitude DECIMAL(10, 8) DEFAULT NULL,  -- συντεταγμένες
                           longitude DECIMAL(11, 8) DEFAULT NULL,
                           pickup_time VARCHAR(100) NOT NULL,
                           status ENUM('active', 'inactive', 'deleted') DEFAULT 'active',
@@ -43,13 +43,13 @@ CREATE TABLE listings (
                           FOREIGN KEY (cook_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- 3. ΠΙΝΑΚΑΣ ΑΛΛΕΡΓΙΟΓΟΝΩΝ (Static Data) [cite: 10]
+--  ΠΙΝΑΚΑΣ ΑΛΛΕΡΓΙΟΓΟΝΩΝ
 CREATE TABLE allergens (
                            allergen_id INT AUTO_INCREMENT PRIMARY KEY,
                            name VARCHAR(100) NOT NULL UNIQUE
 );
 
--- 4. ΠΙΝΑΚΑΣ ΣΥΝΔΕΣΗΣ ΑΓΓΕΛΙΑΣ - ΑΛΛΕΡΓΙΟΓΟΝΩΝ (Many-to-Many)
+-- ΠΙΝΑΚΑΣ ΣΥΝΔΕΣΗΣ ΑΓΓΕΛΙΑΣ - ΑΛΛΕΡΓΙΟΓΟΝΩΝ
 CREATE TABLE listing_allergens (
                                    listing_id INT NOT NULL,
                                    allergen_id INT NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE listing_allergens (
                                    FOREIGN KEY (allergen_id) REFERENCES allergens(allergen_id) ON DELETE CASCADE
 );
 
--- 5. ΠΙΝΑΚΑΣ ΑΙΤΗΜΑΤΩΝ
+-- ΠΙΝΑΚΑΣ ΑΙΤΗΜΑΤΩΝ
 CREATE TABLE requests (
                           request_id INT AUTO_INCREMENT PRIMARY KEY,
                           listing_id INT NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE requests (
                           FOREIGN KEY (consumer_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- 6. ΠΙΝΑΚΑΣ ΑΞΙΟΛΟΓΗΣΕΩΝ
+-- ΠΙΝΑΚΑΣ ΑΞΙΟΛΟΓΗΣΕΩΝ
 CREATE TABLE ratings (
                          rating_id INT AUTO_INCREMENT PRIMARY KEY,
                          request_id INT NOT NULL UNIQUE,
@@ -80,7 +80,7 @@ CREATE TABLE ratings (
                          FOREIGN KEY (request_id) REFERENCES requests(request_id) ON DELETE CASCADE
 );
 
--- ΕΙΣΑΓΩΓΗ ΤΩΝ 14 ΒΑΣΙΚΩΝ ΑΛΛΕΡΓΙΟΓΟΝΩΝ [cite: 10]
+-- ΕΙΣΑΓΩΓΗ ΤΩΝ 14 ΒΑΣΙΚΩΝ ΑΛΛΕΡΓΙΟΓΟΝΩΝ
 INSERT INTO allergens (name) VALUES
                                  ('Celery'), ('Cereals containing gluten'), ('Crustaceans'), ('Eggs'),
                                  ('Fish'), ('Lupin'), ('Milk'), ('Molluscs'), ('Mustard'),
