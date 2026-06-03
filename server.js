@@ -12,6 +12,7 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/ratings', require('./routes/ratings'));
+app.use('/api/meals', require('./routes/meals'));
 // 2. ΜΕΤΑ ΣΕΡΒΙΡΟΥΜΕ ΤΑ ΣΤΑΤΙΚΑ ΑΡΧΕΙΑ (Θωρακισμένο path)
 app.use(express.static(path.join(__dirname, 'Public')));
 
