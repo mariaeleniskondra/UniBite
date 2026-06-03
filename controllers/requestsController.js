@@ -146,10 +146,42 @@ const rejectRequest = (req, res) => {
 const confirmDelivery = (req, res) => {
     const request_id = req.params.id;
 
-    // Σημειώνουμε ότι παραλήφθηκε επιτυχώς
-    db.query('UPDATE requests SET is_delivered = "received" WHERE request_id = ?', [request_id], (err) => {
-        if (err) return res.status(500).json({ message: 'Σφάλμα κατά την επιβεβαίωση' });
-        return res.json({ message: 'Η μερίδα παραδόθηκε επιτυχώς! 📦' });
+    // Χρησιμοποιούμε transaction γιατί κάνουμε πολλές αλλαγές ταυτόχρονα
+    db.beginTransaction((err) => {
+        if (err) return res.status(500).json({ message: 'Σφάλμα συναλλαγής' });
+
+        // 1. Βρίσκουμε ποιος είναι ο μάγειρας και ποιος ο καταναλωτής
+        const findUsersQuery = `
+            SELECT l.cook_id, r.consumer_id
+            FROM requests r
+                     JOIN listings l ON r.listing_id = l.listing_id
+            WHERE r.request_id = ?
+        `;
+
+        db.query(findUsersQuery, [request_id], (err, results) => {
+            if (err || results.length === 0) return db.rollback(() => res.status(500).json({ message: 'Το αίτημα δεν βρέθηκε' }));
+            const { cook_id, consumer_id } = results[0];
+
+            // 2. Σημειώνουμε ότι η παραγγελία παραλήφθηκε (Βάζουμε 'received')
+            db.query('UPDATE requests SET is_delivered = "received" WHERE request_id = ?', [request_id], (err) => {
+                if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα κατά την επιβεβαίωση' }));
+
+                // 3. Δίνουμε +1 ΒΑΣΙΚΟ ΠΟΝΤΟ στον μάγειρα
+                db.query('UPDATE users SET credits = credits + 1 WHERE user_id = ?', [cook_id], (err) => {
+                    if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα κατά την προσθήκη πόντου στον μάγειρα' }));
+
+                    // 4. Αφαιρούμε -1 ΠΟΝΤΟ από τον καταναλωτή που έφαγε
+                    db.query('UPDATE users SET credits = credits - 1 WHERE user_id = ?', [consumer_id], (err) => {
+                        if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα κατά την αφαίρεση πόντου από τον καταναλωτή' }));
+
+                        db.commit((err) => {
+                            if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα commit' }));
+                            return res.json({ message: 'Η μερίδα παραδόθηκε! Ο μάγειρας πήρε +1 πόντο και ο καταναλωτής έδωσε -1 🪙.' });
+                        });
+                    });
+                });
+            });
+        });
     });
 };
 
