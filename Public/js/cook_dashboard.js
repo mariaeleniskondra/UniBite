@@ -4,31 +4,49 @@
 
 const API_URL = '';
 
+// ===== GUARD: Αν δεν υπάρχει token, πήγαινε στο login =====
+const _token = localStorage.getItem('token');
+const _role  = localStorage.getItem('role');
+
+if (!_token || _role === 'admin') {
+    window.location.href = 'index.html';
+}
+
 // Μόλις φορτώσει η σελίδα, τρέχουμε τις συναρτήσεις για να γεμίσουν τα δεδομένα
 document.addEventListener('DOMContentLoaded', () => {
-    loadUserPoints();    // Φόρτωση live πόντων χρήστη
-    loadCookListings();   // Φόρτωση αγγελιών
-    loadCookRequests();   // Φόρτωση αιτημάτων
+    loadUserPoints();
+    loadCookListings();
+    loadCookRequests();
 });
 
 // ===== 0. ΣΥΝΑΡΤΗΣΗ: Φόρτωση Live Πόντων Χρήστη =====
 async function loadUserPoints() {
-    const pointsElement = document.getElementById('userPoints'); // Σιγουρέψου ότι η HTML έχει ένα στοιχείο με id="userPoints" εκεί που έχει τις παύλες "--"
+    const pointsElement = document.getElementById('userPoints');
     const token = localStorage.getItem('token');
 
     if (!token) return;
 
     try {
-        // Καλούμε το endpoint του προφίλ/auth για να πάρουμε τα τρέχοντα credits από τη βάση
         const response = await fetch(`${API_URL}/api/auth/profile`, {
             method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Cache-Control': 'no-cache'
+            },
+            cache: 'no-store'
         });
+
+        if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = 'index.html';
+            return;
+        }
 
         if (response.ok) {
             const data = await response.json();
             if (pointsElement && data.user) {
-                pointsElement.textContent = data.user.credits; // Εμφάνιση των πραγματικών πόντων
+                pointsElement.textContent = data.user.credits;
             }
         }
     } catch (error) {
@@ -42,15 +60,26 @@ async function loadCookListings() {
     const token = localStorage.getItem('token');
 
     if (!token) {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
     }
 
     try {
         const response = await fetch(`${API_URL}/api/listings`, {
             method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Cache-Control': 'no-cache'
+            },
+            cache: 'no-store'
         });
+
+        if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = 'index.html';
+            return;
+        }
 
         const listings = await response.json();
 
@@ -75,26 +104,22 @@ async function loadCookListings() {
                 ? '<span class="badge bg-success">Ενεργή</span>'
                 : '<span class="badge bg-secondary">Εξαντλήθηκε</span>';
 
-            // Δυναμική διαχείριση εικόνας: Αν υπάρχει, τη δείχνουμε. Αν όχι, βάζουμε default emoji.
             const imageHtml = item.image_url
                 ? `<img src="${item.image_url}" class="img-thumbnail rounded me-3" style="width: 100px; height: 100px; object-fit: cover;" onerror="this.src='https://placehold.co/100x100?text=Food'">`
                 : `<div class="bg-light text-center me-3 d-flex align-items-center justify-content-center rounded border" style="width: 100px; height: 100px; min-width: 100px; font-size: 2.2rem;">🥘</div>`;
 
-            // Δυναμική διαχείριση αλλεργιογόνων (Αν το backend επιστρέφει string ή array)
             let allergensHtml = '';
             if (item.allergens_list && item.allergens_list.trim() !== '') {
                 allergensHtml = `
                     <div class="mt-2 d-flex align-items-center gap-1 flex-wrap">
                         <small class="text-danger fw-bold" style="font-size: 0.8rem;">⚠️ Αλλεργιογόνα:</small>
-                        <span class="badge bg-warning text-dark style="font-size: 0.75rem;">${item.allergens_list}</span>
+                        <span class="badge bg-warning text-dark" style="font-size: 0.75rem;">${item.allergens_list}</span>
                     </div>
                 `;
             }
 
             const card = document.createElement('div');
             card.className = 'card shadow-sm border-0 mb-3 p-3 bg-white rounded';
-
-            // Εμπλουτισμένο template της κάρτας με εικόνα, περιγραφή και αλλεργιογόνα αριστερά
             card.innerHTML = `
                 <div class="d-flex justify-content-between align-items-start flex-column flex-sm-row gap-3">
                     <div class="d-flex align-items-start flex-grow-1">
@@ -132,11 +157,24 @@ async function loadCookRequests() {
     const container = document.getElementById('myRequestsContainer');
     const token = localStorage.getItem('token');
 
+    if (!token) return;
+
     try {
         const response = await fetch(`${API_URL}/api/requests/cook`, {
             method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Cache-Control': 'no-cache'
+            },
+            cache: 'no-store'
         });
+
+        if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = 'index.html';
+            return;
+        }
 
         const requests = await response.json();
 
@@ -149,7 +187,6 @@ async function loadCookRequests() {
         requests.forEach(req => {
             const card = document.createElement('div');
 
-            // Διαφορετικό στυλ ανάλογα με το αν εκκρεμεί ή αν έχει εγκριθεί
             if (req.status === 'pending') {
                 card.className = 'card shadow-sm border-start border-warning border-4 mb-3 p-3 bg-white rounded';
                 card.innerHTML = `
@@ -259,7 +296,7 @@ async function deliveryAction(requestId, endpoint) {
 
         if (response.ok) {
             alert(endpoint === 'confirm-delivery' ? 'Η παράδοση καταγράφηκε! 🎉' : 'Το No-Show καταγράφηκε και οι πόντοι αφαιρέθηκαν.');
-            loadUserPoints();   // Ανανέωση πόντων στην οθόνη σε περίπτωση μεταβολής
+            loadUserPoints();
             loadCookListings();
             loadCookRequests();
         } else {
