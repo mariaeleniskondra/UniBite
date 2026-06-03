@@ -33,14 +33,15 @@
 </head>
 <body class="bg-light">
 
-<nav class="unibite-nav" style="background-color: var(--deep-purple);">
+<nav class="unibite-nav">
   <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
-    <div class="brand d-flex align-items-center gap-2">🏆 UniBite</div>
+    <div class="brand">🏆 UniBite</div>
     <div class="nav-actions">
-      <a href="index.html" class="nav-btn active text-decoration-none">Αρχική Feed</a>
-      <a href="my-requests.html" class="nav-btn text-decoration-none">Οι Κρατήσεις μου</a>
-      <a href="admin.html" class="nav-btn text-decoration-none">Admin Panel</a>
-      <a href="login.html" class="nav-btn text-decoration-none">Αποσύνδεση</a>
+      <a href="index.html" class="nav-btn active text-decoration-none">🛒 Θέλω να Φάω (Feed)</a>
+      <a href="cook_dashboard.html" class="nav-btn text-decoration-none">👨‍🍳 Πίνακας Μάγειρα</a>
+      <a href="add_listing.html" class="nav-btn text-decoration-none">+ Δώσε Φαγητό</a>
+      <a href="profile.html" class="nav-btn text-decoration-none">👤 Προφίλ</a>
+      <a href="login.html" class="nav-btn text-decoration-none" onclick="localStorage.removeItem('token')">Αποσύνδεση</a>
     </div>
   </div>
 </nav>
