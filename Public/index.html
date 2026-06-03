@@ -54,7 +54,30 @@
         <h2 class="fw-bold" style="color: var(--deep-purple);">Διαθέσιμα Γεύματα Φοιτητών</h2>
         <p class="text-muted">Βρες σπιτικό φαγητό που διατίθεται δωρεάν στην κοινότητα του Πανεπιστημίου.</p>
       </div>
-
+      <div class="card p-3 mb-4 shadow-sm border-0 bg-light rounded-4">
+        <h6 class="fw-bold mb-3">📍 Φίλτρα Απόστασης</h6>
+        <div class="row g-2">
+          <div class="col-md-12 mb-2">
+            <button class="btn btn-outline-primary btn-sm w-100 fw-bold" id="getLocationBtn">
+              1. Βρες την τοποθεσία μου
+            </button>
+            <small id="userLocationText" class="text-muted d-block mt-1 text-center"></small>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small mb-1">Μέγιστη Απόσταση (km)</label>
+            <input type="number" id="maxDistance" class="form-control form-control-sm" value="5" min="1" step="0.5">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small mb-1">Όριο Αποτελεσμάτων</label>
+            <input type="number" id="maxResults" class="form-control form-control-sm" value="10" min="1">
+          </div>
+          <div class="col-12 mt-2">
+            <button class="btn btn-success btn-sm w-100 fw-bold" id="applyFiltersBtn" disabled>
+              2. Εφαρμογή Φίλτρων
+            </button>
+          </div>
+        </div>
+      </div>
       <div id="mealFeedContainer" class="d-flex flex-column gap-3">
         <p class="text-muted text-center p-4">Φόρτωση διαθέσιμων γευμάτων...</p>
       </div>

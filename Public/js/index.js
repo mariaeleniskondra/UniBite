@@ -1,11 +1,62 @@
 let map;
 let markersGroup;
+let userLat = null;
+let userLng = null;
+let userMarker = null;
+
+// sinartisi Haversine gia ipologismo apostasis 2 simion se km
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // aktina tis gis se km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
     //arxikopoiisi xarti
     initMap();
 
     fetchAvailableMeals();
+
+    const getLocationBtn = document.getElementById('getLocationBtn');
+    if (getLocationBtn) {
+        getLocationBtn.addEventListener('click', () => {
+            const textLabel = document.getElementById('userLocationText');
+            textLabel.textContent = "Αναζήτηση τοποθεσίας...";
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    userLat = position.coords.latitude;
+                    userLng = position.coords.longitude;
+                    textLabel.innerHTML = "<span class='text-success fw-bold'>Η τοποθεσία βρέθηκε!</span>";
+
+                    document.getElementById('applyFiltersBtn').disabled = false;
+
+                    if (userMarker) { map.removeLayer(userMarker); }
+                    userMarker = L.circleMarker([userLat, userLng], {
+                        radius: 8, fillColor: "#0d6efd", color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.9
+                    }).addTo(map).bindPopup("Βρίσκεστε εδώ!").openPopup();
+
+                    map.setView([userLat, userLng], 14);
+                }, () => {
+                    textLabel.innerHTML = "<span class='text-danger'>Σφάλμα πρόσβασης τοποθεσίας.</span>";
+                });
+            }
+        });
+    }
+
+
+    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', () => {
+            fetchAvailableMeals(); // Φορτώνει πάλι τα γεύματα, αλλά τώρα θα εφαρμόσει τα φίλτρα!
+        });
+    }
 });
 
 function initMap() {
@@ -48,7 +99,28 @@ function fetchAvailableMeals() {
             markersGroup.clearLayers();
 
 
-            const activeMeals = meals.filter(meal => meal.status === 'active' && meal.available_portions > 0);
+            let activeMeals = meals.filter(meal => meal.status === 'active' && meal.available_portions > 0);
+
+            if (userLat !== null && userLng !== null) {
+                const maxDist = parseFloat(document.getElementById('maxDistance').value) || 5;
+                const maxRes = parseInt(document.getElementById('maxResults').value) || 10;
+
+                // 1. Υπολογισμός απόστασης
+                activeMeals.forEach(meal => {
+                    const mLat = meal.latitude || 38.2881;
+                    const mLng = meal.longitude || 21.7885;
+                    meal.distance = calculateDistance(userLat, userLng, mLat, mLng);
+                });
+
+                // 2. Κόβουμε όσα είναι πιο μακριά από τη μέγιστη απόσταση
+                activeMeals = activeMeals.filter(meal => meal.distance <= maxDist);
+
+                // 3. Ταξινόμηση (από το πιο κοντινό στο πιο μακρινό)
+                activeMeals.sort((a, b) => a.distance - b.distance);
+
+                // 4. Περιορισμός αριθμού αποτελεσμάτων (limit)
+                activeMeals = activeMeals.slice(0, maxRes);
+            }
 
             if (activeMeals.length === 0) {
                 feedContainer.innerHTML = '<p class="text-muted text-center p-4">Δεν υπάρχουν διαθέσιμα γεύματα αυτή τη στιγμή.</p>';
@@ -57,6 +129,10 @@ function fetchAvailableMeals() {
 
 
             activeMeals.forEach(meal => {
+                const distanceBadge = meal.distance !== undefined
+                    ? `<span class="badge bg-info text-dark mb-2">📍 ${meal.distance.toFixed(1)} km μακριά</span>`
+                    : '';
+
                 const mealCard = `
                     <div class="card meal-feed-card shadow-sm border-0 p-3 rounded-4 mb-3" onclick="focusOnMeal(${meal.listing_id})">
                         <div class="d-flex justify-content-between align-items-start">
