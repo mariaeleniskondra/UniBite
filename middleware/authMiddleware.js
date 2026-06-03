@@ -17,4 +17,14 @@ const verifyToken = (req, res, next) => {
     }
 };
 
-module.exports = { verifyToken };
+const isAdmin = (req, res, next) => {
+    // Αν ο χρήστης είναι admin, τον αφήνουμε να περάσει (next)
+    if (req.user && req.user.role === 'admin') {
+        next();
+    } else {
+        // Αν είναι απλός φοιτητής, του ρίχνουμε "πόρτα" με 403 Forbidden!
+        return res.status(403).json({ message: '403 Forbidden: Άρνηση πρόσβασης. Δεν είστε διαχειριστής.' });
+    }
+};
+
+module.exports = { verifyToken, isAdmin };
