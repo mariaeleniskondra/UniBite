@@ -4,7 +4,7 @@
 
 const API_URL = '';
 
-// Φόρτωση live στατιστικών από τη βάση δεδομένων
+// Φόρτωση live στατιστικών από τη βάση δεδομένων στην αρχική σελίδα
 document.addEventListener('DOMContentLoaded', async () => {
     const portionsEl = document.getElementById('statPortions');
     const usersEl = document.getElementById('statUsers');
@@ -56,7 +56,6 @@ document.getElementById('registerFormEl').addEventListener('submit', async (e) =
     errorDiv.classList.add('d-none');
     successDiv.classList.add('d-none');
 
-    // ΔΙΟΡΘΩΣΗ: Διαβάζουμε το ενιαίο username όπως ορίστηκε στην HTML
     const username = document.getElementById('regUsername').value.trim();
     const email = document.getElementById('regEmail').value.trim();
     const password = document.getElementById('regPassword').value.trim();
@@ -93,7 +92,7 @@ document.getElementById('registerFormEl').addEventListener('submit', async (e) =
 });
 
 // ========================================================
-// 2. ΛΟΓΙΚΗ ΣΥΝΔΕΣΗΣ (LOGIN)
+// 2. ΛΟΓΙΚΗ ΣΥΝΔΕΣΗΣ (LOGIN) - ΜΕ ΑΝΑΚΑΤΕΥΘΥΝΣΗ ΡΟΛΟΥ
 // ========================================================
 document.getElementById('loginFormEl').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -114,8 +113,16 @@ document.getElementById('loginFormEl').addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (response.ok) {
+            // Αποθηκεύουμε το token ασφαλείας στο localStorage
             localStorage.setItem('token', data.token);
-            window.location.href = 'cook_dashboard.html';
+            localStorage.setItem('role', data.role);
+
+            // ΕΛΕΓΧΟΣ ΡΟΛΟΥ ΚΑΙ ΑΝΑΚΑΤΕΥΘΥΝΣΗ (REDIRECT)
+            if (data.role === 'admin') {
+                window.location.href = 'admin.html'; // Πηγαίνει στο admin dashboard
+            } else {
+                window.location.href = 'cook_dashboard.html'; // Πηγαίνει στο φοιτητικό dashboard
+            }
         } else {
             errorDiv.classList.remove('d-none');
             errorDiv.textContent = data.message || 'Λάθος στοιχεία σύνδεσης.';
