@@ -79,7 +79,9 @@ function fetchAvailableMeals() {
                 `;
                 feedContainer.innerHTML += mealCard;
 
-                const coords = locationCoordinates[meal.pickup_location] || [38.2881, 21.7885];
+                const coords = (meal.latitude && meal.longitude)
+                    ? [meal.latitude, meal.longitude]
+                    : [38.2881, 21.7885];
 
                 const marker = L.marker(coords).bindPopup(`
                     <div style="font-family: 'Inter', sans-serif;">
