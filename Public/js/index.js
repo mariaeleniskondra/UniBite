@@ -110,8 +110,49 @@ function focusOnMeal(listingId) {
     });
 }
 
-// Προσωρινή λειτουργία κράτησης (Θα τη συνδέσουμε με το Backend των κρατήσεων στη συνέχεια)
+
 function bookMeal(event, listingId) {
-    event.stopPropagation();
-    alert('Θέλετε να κάνετε κράτηση για το γεύμα με ID: ' + listingId + ';');
+    event.stopPropagation(); // Εμποδίζει το κλικ της κάρτας  από το να ανοίξει το popup του χάρτη ταυτόχρονα
+
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('Δεν είστε συνδεδεμένος/η. Παρακαλώ συνδεθείτε για να κάνετε κράτηση.');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // parathiro epivevaiosis
+    if (!confirm('Θέλετε να προχωρήσετε σε δέσμευση μιας μερίδας από αυτό το γεύμα;')) {
+        return;
+    }
+
+    // POST sto backend
+    fetch('/api/requests', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Προσθήκη του token για το authMiddleware
+        },
+        body: JSON.stringify({
+            listing_id: listingId
+        })
+    })
+        .then(async response => {
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Αποτυχία κατά την ολοκλήρωση της κράτησης.');
+            }
+            return data;
+        })
+        .then(data => {
+            alert('Η κράτηση υποβλήθηκε με επιτυχία! Εκκρεμεί η έγκριση του μάγειρα. ⏳');
+
+            // ananeosi feed kai xarti  live
+            fetchAvailableMeals();
+        })
+        .catch(error => {
+            console.error('Error during booking request:', error);
+            alert('Σφάλμα: ' + error.message);
+        });
 }
