@@ -1,4 +1,6 @@
-
+// ========================================================
+// add_listing.js - Ολοκληρωμένη Δημιουργία Αγγελίας με Εικόνα
+// ========================================================
 
 const API_URL = ''; // Αφήνουμε κενό για να παίρνει αυτόματα το τρέχον host (localhost:8080)
 
@@ -21,40 +23,43 @@ document.getElementById('addListingForm').addEventListener('submit', async (e) =
         return;
     }
 
-    // 2. Μάζεμα των βασικών στοιχείων από τα πεδία της φόρμας
-    const title = document.getElementById('title').value.trim();
-    const total_portions = parseInt(document.getElementById('total_portions').value);
-    const pickup_location = document.getElementById('pickup_location').value.trim();
-    const pickup_time = document.getElementById('pickup_time').value.trim();
-    const description = document.getElementById('description').value.trim();
+    // 2. Χρήση FormData για την υποστήριξη αποστολής αρχείου (Multipart/Form-Data)
+    const formData = new FormData();
 
-    // 3. Μάζεμα των επιλεγμένων αλλεργιογόνων (κρατάμε τα IDs τους)
+    // Προσθήκη των βασικών κειμένων και αριθμών
+    formData.append('title', document.getElementById('title').value.trim());
+    formData.append('total_portions', parseInt(document.getElementById('total_portions').value));
+    formData.append('pickup_location', document.getElementById('pickup_location').value.trim());
+    formData.append('pickup_time', document.getElementById('pickup_time').value.trim());
+    formData.append('description', document.getElementById('description').value.trim());
+
+    // 3. Προσθήκη του αρχείου εικόνας (αν έχει επιλεγεί από τον χρήστη - Προαιρετικό!)
+    const imageInput = document.getElementById('image');
+    if (imageInput && imageInput.files[0]) {
+        formData.append('image', imageInput.files[0]); // Το όνομα 'image' πρέπει να είναι ολόιδιο με το upload.single('image') στο router
+    }
+
+    // 4. Μάζεμα των επιλεγμένων αλλεργιογόνων
     const selectedAllergens = [];
     const checkboxes = document.querySelectorAll('.allergen-checkbox:checked');
     checkboxes.forEach((cb) => {
-        selectedAllergens.push(parseInt(cb.value)); // Το cb.value αντιστοιχεί στο allergen_id (1 έως 14)
+        selectedAllergens.push(parseInt(cb.value));
     });
 
-    // Προετοιμασία του αντικειμένου για αποστολή
-    const listingData = {
-        title,
-        total_portions,
-        pickup_location,
-        pickup_time,
-        description,
-        allergens: selectedAllergens // Πίνακας με IDs π.χ. [2, 7]
-    };
+    // ΕΠΕΞΗΓΗΣΗ: Επειδή το FormData δέχεται μόνο strings ή αρχεία, μετατρέπουμε τον πίνακα
+    // των αλλεργιογόνων σε JSON String. Το backend θα αναλάβει να το κάνει JSON.parse()
+    formData.append('allergens', JSON.stringify(selectedAllergens));
 
     try {
-        // 4. Αποστολή των δεδομένων στο Backend API
+        // 5. Αποστολή των δεδομένων στο Backend API
         const response = await fetch(`${API_URL}/api/listings`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // Αυτή είναι η πιο κρίσιμη γραμμή. Επειδή το route της δημιουργίας αγγελίας είναι κλειδωμένο και απαιτεί σύνδεση, περνάμε το token μέσα στα headers.
-                // Έτσι, το backend θα ξέρει ακριβώς ποιος μάγειρας πάει να ανεβάσει το φαγητό.
+                // ΠΡΟΣΟΧΗ: ΔΕΝ βάζουμε 'Content-Type'. Όταν στέλνουμε FormData, ο browser
+                // ρυθμίζει αυτόματα το σωστό Content-Type μαζί με το απαραίτητο multipart boundary!
+                'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(listingData)
+            body: formData // Στέλνουμε το formData αντικείμενο αντί για JSON string
         });
 
         const data = await response.json();

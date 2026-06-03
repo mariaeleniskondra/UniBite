@@ -6,9 +6,35 @@ const API_URL = '';
 
 // Μόλις φορτώσει η σελίδα, τρέχουμε τις συναρτήσεις για να γεμίσουν τα δεδομένα
 document.addEventListener('DOMContentLoaded', () => {
-    loadCookListings();
-    loadCookRequests();
+    loadUserPoints();    // Φόρτωση live πόντων χρήστη
+    loadCookListings();   // Φόρτωση αγγελιών
+    loadCookRequests();   // Φόρτωση αιτημάτων
 });
+
+// ===== 0. ΣΥΝΑΡΤΗΣΗ: Φόρτωση Live Πόντων Χρήστη =====
+async function loadUserPoints() {
+    const pointsElement = document.getElementById('userPoints'); // Σιγουρέψου ότι η HTML έχει ένα στοιχείο με id="userPoints" εκεί που έχει τις παύλες "--"
+    const token = localStorage.getItem('token');
+
+    if (!token) return;
+
+    try {
+        // Καλούμε το endpoint του προφίλ/auth για να πάρουμε τα τρέχοντα credits από τη βάση
+        const response = await fetch(`${API_URL}/api/auth/profile`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (pointsElement && data.user) {
+                pointsElement.textContent = data.user.credits; // Εμφάνιση των πραγματικών πόντων
+            }
+        }
+    } catch (error) {
+        console.error('Error loading user points:', error);
+    }
+}
 
 // ===== 1. ΣΥΝΑΡΤΗΣΗ: Φόρτωση Αγγελιών Μάγειρα =====
 async function loadCookListings() {
@@ -49,24 +75,44 @@ async function loadCookListings() {
                 ? '<span class="badge bg-success">Ενεργή</span>'
                 : '<span class="badge bg-secondary">Εξαντλήθηκε</span>';
 
+            // Δυναμική διαχείριση εικόνας: Αν υπάρχει, τη δείχνουμε. Αν όχι, βάζουμε default emoji.
+            const imageHtml = item.image_url
+                ? `<img src="${item.image_url}" class="img-thumbnail rounded me-3" style="width: 100px; height: 100px; object-fit: cover;" onerror="this.src='https://placehold.co/100x100?text=Food'">`
+                : `<div class="bg-light text-center me-3 d-flex align-items-center justify-content-center rounded border" style="width: 100px; height: 100px; min-width: 100px; font-size: 2.2rem;">🥘</div>`;
+
+            // Δυναμική διαχείριση αλλεργιογόνων (Αν το backend επιστρέφει string ή array)
+            let allergensHtml = '';
+            if (item.allergens_list && item.allergens_list.trim() !== '') {
+                allergensHtml = `
+                    <div class="mt-2 d-flex align-items-center gap-1 flex-wrap">
+                        <small class="text-danger fw-bold" style="font-size: 0.8rem;">⚠️ Αλλεργιογόνα:</small>
+                        <span class="badge bg-warning text-dark style="font-size: 0.75rem;">${item.allergens_list}</span>
+                    </div>
+                `;
+            }
+
             const card = document.createElement('div');
             card.className = 'card shadow-sm border-0 mb-3 p-3 bg-white rounded';
 
-            // Εδώ προσθέσαμε ξανά τα κουμπιά Διόρθωσης και Διαγραφής που έλειπαν!
+            // Εμπλουτισμένο template της κάρτας με εικόνα, περιγραφή και αλλεργιογόνα αριστερά
             card.innerHTML = `
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="mb-2">${statusBadge}</div>
-                        <h5 class="fw-bold text-primary m-0">${item.title}</h5>
-                        <p class="text-muted small my-1">📍 Τοποθεσία: ${item.pickup_location}</p>
-                        <p class="text-muted small my-1">⏰ Ώρες: ${item.pickup_time}</p>
-                        <p class="mt-2 text-dark" style="font-size: 0.95rem;">${item.description || '<i>Χωρίς περιγραφή</i>'}</p>
+                <div class="d-flex justify-content-between align-items-start flex-column flex-sm-row gap-3">
+                    <div class="d-flex align-items-start flex-grow-1">
+                        ${imageHtml}
+                        <div>
+                            <div class="mb-2">${statusBadge}</div>
+                            <h5 class="fw-bold text-primary m-0">${item.title}</h5>
+                            <p class="text-muted small my-1">📍 Τοποθεσία: ${item.pickup_location}</p>
+                            <p class="text-muted small my-1">⏰ Ώρες: ${item.pickup_time}</p>
+                            <p class="mt-2 text-dark mb-0" style="font-size: 0.95rem;">${item.description || '<i>Χωρίς περιγραφή</i>'}</p>
+                            ${allergensHtml}
+                        </div>
                     </div>
-                    <div class="text-end">
-                        <span class="badge bg-light text-dark border p-2 mb-3 d-block">
+                    <div class="text-end align-self-stretch align-self-sm-start d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-end">
+                        <span class="badge bg-light text-dark border p-2 mb-0 mb-sm-3">
                             ${item.available_portions} / ${item.total_portions} μερίδες
                         </span>
-                        <div class="d-flex gap-2 justify-content-end">
+                        <div class="d-flex gap-2">
                             <button class="btn btn-sm btn-warning text-dark fw-bold" onclick="editListing(${item.listing_id})">📝 Διόρθωση</button>
                             <button class="btn btn-sm btn-danger fw-bold" onclick="deleteListing(${item.listing_id})">🗑️ Διαγραφή</button>
                         </div>
@@ -143,16 +189,32 @@ async function loadCookRequests() {
 }
 
 // ===== 3. ΣΥΝΑΡΤΗΣΗ: Μεταφορά στη Σελίδα Επεξεργασίας (Edit) =====
-function editListing(id) { window.location.href = `edit_listing.html?id=${id}`; }
+function editListing(id) {
+    window.location.href = `edit_listing.html?id=${id}`;
+}
 
 // ===== 4. ΣΥΝΑΡΤΗΣΗ: Διαγραφή Αγγελίας (Soft Delete) =====
 async function deleteListing(id) {
     if (!confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή την αγγελία;')) return;
+
     const token = localStorage.getItem('token');
     try {
-        const response = await fetch(`${API_URL}/api/listings/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-        if (response.ok) { alert('Η αγγελία διαγράφηκε επιτυχώς!'); loadCookListings(); } else { alert('Αποτυχία διαγραφής.'); }
-    } catch (error) { alert('Σφάλμα σύνδεσης.'); }
+        const response = await fetch(`${API_URL}/api/listings/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Η αγγελία διαγράφηκε επιτυχώς!');
+            loadCookListings();
+        } else {
+            alert(data.message || 'Αποτυχία διαγραφής.');
+        }
+    } catch (error) {
+        alert('Σφάλμα κατά τη σύνδεση με τον διακομιστή.');
+    }
 }
 
 // ===== 5. ΣΥΝΑΡΤΗΣΗ: Διαχείριση Έγκρισης / Απόρριψης Αιτήματος =====
@@ -161,18 +223,31 @@ async function handleRequest(requestId, action) {
     if (!confirm(action === 'approve' ? 'Θέλετε να εγκρίνετε αυτό το αίτημα;' : 'Θέλετε να απορρίψετε αυτό το αίτημα;')) return;
 
     try {
-        const response = await fetch(`${API_URL}/api/requests/${requestId}/${action}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } });
+        const response = await fetch(`${API_URL}/api/requests/${requestId}/${action}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+
         if (response.ok) {
             alert(action === 'approve' ? 'Το αίτημα εγκρίθηκε! 👍' : 'Το αίτημα απορρίφθηκε.');
-            loadCookListings(); loadCookRequests();
-        } else { alert('Αποτυχία επεξεργασίας αιτήματος.'); }
-    } catch (error) { alert('Σφάλμα σύνδεσης.'); }
+            loadCookListings();
+            loadCookRequests();
+        } else {
+            alert(data.message || 'Αποτυχία επεξεργασίας αιτήματος.');
+        }
+    } catch (error) {
+        alert('Σφάλμα κατά τη σύνδεση με τον διακομιστή.');
+    }
 }
 
-// ===== 6. ΣΥΝΑΡΤΗΣΗ: Διαχείριση Παράδοσης / No-Show (Β3) =====
+// ===== 6. ΣΥΝΑΡΤΗΣΗ: Διαχείριση Παράδοσης / No-Show =====
 async function deliveryAction(requestId, endpoint) {
     const token = localStorage.getItem('token');
-    const msg = endpoint === 'confirm-delivery' ? 'Επιβεβαιώνετε ότι ο φοιτητής παρέλαβε το φαγητό;' : 'Επιβεβαιώνετε ότι ο φοιτητής ΔΕΝ εμφανίστηκε για την παραλαβή;';
+    const msg = endpoint === 'confirm-delivery'
+        ? 'Επιβεβαιώνετε ότι ο φοιτητής παρέλαβε το φαγητό;'
+        : 'Επιβεβαιώνετε ότι ο φοιτητής ΔΕΝ εμφανίστηκε για την παραλαβή;';
 
     if (!confirm(msg)) return;
 
@@ -184,72 +259,13 @@ async function deliveryAction(requestId, endpoint) {
 
         if (response.ok) {
             alert(endpoint === 'confirm-delivery' ? 'Η παράδοση καταγράφηκε! 🎉' : 'Το No-Show καταγράφηκε και οι πόντοι αφαιρέθηκαν.');
-            loadCookListings(); loadCookRequests();
+            loadUserPoints();   // Ανανέωση πόντων στην οθόνη σε περίπτωση μεταβολής
+            loadCookListings();
+            loadCookRequests();
         } else {
             alert('Αποτυχία ενημέρωσης κατάστασης παράδοσης.');
         }
     } catch (error) {
         alert('Σφάλμα σύνδεσης με τον server.');
-    }
-}
-
-// ===== 3. ΣΥΝΑΡΤΗΣΗ: Μεταφορά στη Σελίδα Επεξεργασίας (Edit) =====
-function editListing(id) {
-    window.location.href = `edit_listing.html?id=${id}`;
-}
-
-// ===== 4. ΣΥΝΑΡΤΗΣΗ: Διαγραφή Αγγελίας (Soft Delete) =====
-async function deleteListing(id) {
-    if (!confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή την αγγελία;')) return;
-
-    const token = localStorage.getItem('token');
-
-    try {
-        const response = await fetch(`${API_URL}/api/listings/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            alert('Η αγγελία διαγράφηκε επιτυχώς!');
-            loadCookListings(); // Ξαναφορτώνουμε τη λίστα για να εξαφανιστεί η κάρτα live
-        } else {
-            alert(data.message || 'Αποτυχία διαγραφής.');
-        }
-    } catch (error) {
-        console.error('Delete listing error:', error);
-        alert('Σφάλμα κατά τη σύνδεση με τον διακομιστή.');
-    }
-}
-
-// ===== 5. ΣΥΝΑΡΤΗΣΗ: Διαχείριση Έγκρισης / Απόρριψης Αιτήματος =====
-async function handleRequest(requestId, action) {
-    const token = localStorage.getItem('token');
-    const message = action === 'approve' ? 'Θέλετε να εγκρίνετε αυτό το αίτημα;' : 'Θέλετε να απορρίψετε αυτό το αίτημα;';
-
-    if (!confirm(message)) return;
-
-    try {
-        // Στήνουμε το PUT αίτημα προς το backend endpoint των αιτημάτων
-        const response = await fetch(`${API_URL}/api/requests/${requestId}/${action}`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            alert(action === 'approve' ? 'Το αίτημα εγκρίθηκε! 👍' : 'Το αίτημα απορρίφθηκε.');
-            // Ανανεώνουμε live και τις δύο στήλες για να φαίνονται οι νέες μερίδες και να φύγει το αίτημα
-            loadCookListings();
-            loadCookRequests();
-        } else {
-            alert(data.message || 'Αποτυχία επεξεργασίας αιτήματος.');
-        }
-    } catch (error) {
-        console.error('Handle request error:', error);
-        alert('Σφάλμα κατά τη σύνδεση με τον διακομιστή.');
     }
 }
