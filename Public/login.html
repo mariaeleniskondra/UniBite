@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Σύνδεση - UniBite</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
@@ -13,12 +14,21 @@
 <div class="container-fluid p-0">
     <div class="row g-0">
 
+        <!-- ΑΡΙΣΤΕΡΟ ΠΑΝΕΛ: ΠΛΗΡΟΦΟΡΙΕΣ & LIVE ΣΤΑΤΙΣΤΙΚΑ -->
         <div class="col-12 col-lg-6 left-pane">
             <div class="pe-lg-5">
-                <div class="custom-badge mb-4">• Φοιτητικό Food Sharing</div>
-                <h1 class="main-heading" style="font-size: 4rem;">Uni<span class="text-accent">Bite</span></h1>
-                <p class="text-muted mb-5 fs-5">Μοιράσου τις περισσευούμενες μερίδες σου με συμφοιτητές και κέρδισε πόντους.</p>
 
+                <div class="custom-badge mb-4">• Φοιτητικό Food Sharing</div>
+
+                <h1 class="main-heading" style="font-size: 4rem;">
+                    Uni<span class="text-accent">Bite</span>
+                </h1>
+
+                <p class="text-muted mb-5 fs-5">
+                    Μοιράσου τις περισσευούμενες μερίδες σου με συμφοιτητές και κέρδισε πόντους.
+                </p>
+
+                <!-- LIVE ΣΤΑΤΙΣΤΙΚΑ (Συνδεδεμένα με το auth.js) -->
                 <div class="d-flex mb-5 text-center">
                     <div class="pe-3 pe-md-4 stats-divider">
                         <p class="stat-number" id="statPortions">...</p>
@@ -34,90 +44,113 @@
                     </div>
                 </div>
 
-                <div class="mt-4">
-                    <h5 class="fw-bold mb-3" style="color: #4A5568;">Πώς λειτουργεί;</h5>
-                    <div class="d-flex align-items-start gap-3 mb-3">
-                        <div class="fs-4 px-2 py-1 bg-light rounded-circle">1️⃣</div>
+                <!-- ΔΟΚΙΜΑΣΤΙΚΕΣ ΜΙΝΙ ΚΑΡΤΕΣ Layout -->
+                <div class="mini-card">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="fs-3">🥘</div>
                         <div>
-                            <h6 class="mb-0 fw-bold">Ανέβασε το πιάτο σου</h6>
-                            <small class="text-muted">Ετοίμασες παραπάνω φαγητό; Μοιράσου το με την κοινότητα μέσα σε λίγα δευτερόλεπτα.</small>
+                            <h6 class="mb-0 fw-bold">Μουσακάς με μελιτζάνα</h6>
+                            <small class="text-muted">Εστία Β' · Παραλαβή 13:00-14:00</small>
                         </div>
                     </div>
-                    <div class="d-flex align-items-start gap-3 mb-3">
-                        <div class="fs-4 px-2 py-1 bg-light rounded-circle">2️⃣</div>
-                        <div>
-                            <h6 class="mb-0 fw-bold">Έγκρινε τα αιτήματα</h6>
-                            <small class="text-muted">Δες ποιοι συμφοιτητές σου ενδιαφέρονται, κάνε έγκριση και δώσε ραντεβού για την παράδοση.</small>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="fs-4 px-2 py-1 bg-light rounded-circle">3️⃣</div>
-                        <div>
-                            <h6 class="mb-0 fw-bold">Κέρδισε πόντους & αξιολογήσεις</h6>
-                            <small class="text-muted">Μαζεύεις credits για να μπορείς να ζητήσεις κι εσύ φαγητό, χτίζοντας ένα δίκτυο αλληλεγγύης.</small>
-                        </div>
-                    </div>
+                    <div class="portion-badge">3 μερίδες</div>
                 </div>
+
+                <div class="mini-card">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="fs-3">🍲</div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Φακές σούπα</h6>
+                            <small class="text-muted">Κτήριο Πολυτεχνικής · 12:30-13:30</small>
+                        </div>
+                    </div>
+                    <div class="portion-badge">1 μερίδα</div>
+                </div>
+
             </div>
         </div>
 
+        <!-- ΔΕΞΙ ΠΑΝΕΛ: ΦΟΡΜΕΣ ΣΥΝΔΕΣΗΣ / ΕΓΓΡΑΦΗΣ -->
         <div class="col-12 col-lg-6 right-pane">
             <div class="login-wrapper">
+
+                <!-- ΚΟΥΜΠΙΑ ΕΝΑΛΛΑΓΗΣ TABS -->
                 <div class="toggle-container">
                     <div class="toggle-btn active" onclick="showTab('login')">Σύνδεση</div>
                     <div class="toggle-btn" onclick="showTab('register')">Εγγραφή</div>
                 </div>
 
+                <!-- ΦΟΡΜΑ ΣΥΝΔΕΣΗΣ (LOGIN) -->
                 <div id="loginForm">
                     <h2 class="fw-bold mb-1">Καλώς ήρθες πίσω</h2>
                     <p class="text-muted mb-4">Συνδέσου για να δεις τις αγγελίες</p>
+
                     <form id="loginFormEl">
                         <div class="mb-3">
                             <label class="form-label">Email πανεπιστημίου</label>
-                            <input type="email" id="loginEmail" class="form-control" placeholder="p21xxxxx@upatras.gr" required>
+                            <input type="email" id="loginEmail" class="form-control"
+                                   placeholder="p21xxxxx@upatras.gr" required>
                         </div>
+
                         <div class="mb-4">
                             <label class="form-label">Κωδικός</label>
-                            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                            <input type="password" id="loginPassword" class="form-control"
+                                   placeholder="••••••••" required>
                         </div>
+
                         <div id="loginError" class="alert alert-danger d-none"></div>
+
                         <button type="submit" class="btn-submit">Σύνδεση</button>
                     </form>
                 </div>
 
+                <!-- ΦΟΡΜΑ ΕΓΓΡΑΦΗΣ (REGISTER) - ΔΙΟΡΘΩΜΕΝΗ -->
                 <div id="registerForm" class="d-none">
                     <h2 class="fw-bold mb-1">Δημιουργία λογαριασμού</h2>
                     <p class="text-muted mb-4">Ξεκίνα με 5 δωρεάν πόντους!</p>
+
                     <form id="registerFormEl">
-                        <!-- ΔΙΟΡΘΩΣΗ: Ενιαίο Username αντί για first_name/last_name -->
+
+                        <!-- Ενιαίο πεδίο Username απόλυτα ευθυγραμμισμένο με το auth.js και τη MySQL -->
                         <div class="mb-3">
                             <label class="form-label">Όνομα Χρήστη (Username)</label>
-                            <input type="text" id="regUsername" class="form-control" placeholder="π.χ. maria_p" required>
+                            <input type="text" id="regUsername" class="form-control"
+                                   placeholder="e.g. eleni_maria" required>
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label">Email πανεπιστημίου</label>
-                            <input type="email" id="regEmail" class="form-control" placeholder="p21xxxxx@upatras.gr" required>
+                            <input type="email" id="regEmail" class="form-control"
+                                   placeholder="p21xxxxx@upatras.gr" required>
                         </div>
+
                         <div class="mb-4">
                             <label class="form-label">Κωδικός</label>
-                            <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required>
+                            <input type="password" id="regPassword" class="form-control"
+                                   placeholder="••••••••" required>
                         </div>
+
                         <div id="registerError" class="alert alert-danger d-none"></div>
                         <div id="registerSuccess" class="alert alert-success d-none"></div>
+
                         <button type="submit" class="btn-submit">Εγγραφή</button>
                     </form>
                 </div>
 
+                <!-- INFO FOOTER -->
                 <div class="info-box mt-4">
                     <div>ℹ️</div>
                     <div>Οι νέοι χρήστες ξεκινούν με <strong>5 πόντους</strong> για να κάνουν το πρώτο τους αίτημα!</div>
                 </div>
+
             </div>
         </div>
 
     </div>
 </div>
 
+<!-- Εισαγωγή του αρχείου JavaScript διαχείρισης -->
 <script src="js/auth.js"></script>
+
 </body>
 </html>

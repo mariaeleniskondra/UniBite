@@ -7,6 +7,7 @@ USE unibite_db;
 
 -- Καθαρίζουμε τους παλιούς πίνακες για να αποφύγουμε conflicts
 DROP TABLE IF EXISTS ratings;
+
 DROP TABLE IF EXISTS requests;
 DROP TABLE IF EXISTS listing_allergens;
 DROP TABLE IF EXISTS allergens;
@@ -29,6 +30,7 @@ CREATE TABLE users (
 -- 2. ΠΙΝΑΚΑΣ ΑΓΓΕΛΙΩΝ
 CREATE TABLE listings (
                           listing_id INT AUTO_INCREMENT PRIMARY KEY,
+
                           cook_id INT NOT NULL,
                           title VARCHAR(150) NOT NULL,
                           description TEXT,
@@ -142,6 +144,7 @@ INSERT INTO requests (listing_id, consumer_id, status, is_delivered) VALUES (3, 
 INSERT INTO requests (listing_id, consumer_id, status, is_delivered) VALUES (5, 5, 'approved', 'received');
 
 
+
 -- 5. ΕΙΣΑΓΩΓΗ ΑΞΙΟΛΟΓΗΣΕΩΝ (RATINGS)
 -- Συνδέουμε τις αξιολογήσεις με τα request_ids (1 έως 8) που δημιουργήθηκαν αυτόματα παραπάνω
 
@@ -160,3 +163,5 @@ INSERT INTO ratings (request_id, rating_value, comments) VALUES (7, 4, 'Μια �
 
 -- Αξιολόγηση για τα Μακαρόνια της Ελένης (request_id: 8) -> Μέσος όρος: 3.0
 INSERT INTO ratings (request_id, rating_value, comments) VALUES (8, 3, 'Λίγο κρύο αλλά γευστικό.');
+
+
