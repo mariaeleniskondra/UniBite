@@ -56,7 +56,6 @@ document.getElementById('registerFormEl').addEventListener('submit', async (e) =
     errorDiv.classList.add('d-none');
     successDiv.classList.add('d-none');
 
-    // ΔΙΟΡΘΩΣΗ: Διαβάζουμε το ενιαίο username όπως ορίστηκε στην HTML
     const username = document.getElementById('regUsername').value.trim();
     const email = document.getElementById('regEmail').value.trim();
     const password = document.getElementById('regPassword').value.trim();
@@ -114,8 +113,17 @@ document.getElementById('loginFormEl').addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (response.ok) {
+            // 1. Αποθηκεύουμε το JWT Token
             localStorage.setItem('token', data.token);
-            window.location.href = 'cook_dashboard.html';
+
+            // 2. ΔΙΟΡΘΩΣΗ: Εφαρμογή του Κριτηρίου Ρόλου (Role) για ανακατεύθυνση
+            if (data.role === 'admin') {
+                // Αν στη βάση ο χρήστης είναι 'admin', πηγαίνει στη σελίδα διαχειριστή
+                window.location.href = 'admin.html';
+            } else {
+                // Αν είναι 'student' (απλός φοιτητής/μάγειρας), πηγαίνει στο dashboard του
+                window.location.href = 'cook_dashboard.html';
+            }
         } else {
             errorDiv.classList.remove('d-none');
             errorDiv.textContent = data.message || 'Λάθος στοιχεία σύνδεσης.';

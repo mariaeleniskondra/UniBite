@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const requestsController = require('../controllers/requestsController');
 
-// ΚΡΙΣΙΜΗ ΔΙΟΡΘΩΣΗ: Αντικατάσταση του τοπικού middleware με το κεντρικό
+//  Αντικατάσταση του τοπικού middleware με το κεντρικό
 const { verifyToken } = require('../middleware/authMiddleware');
 
 // ===== ENDPOINTS ΔΙΑΧΕΙΡΙΣΗΣ ΑΙΤΗΜΑΤΩΝ =====
@@ -22,5 +22,7 @@ router.put('/:id/confirm-delivery', verifyToken, requestsController.confirmDeliv
 // Μη Εμφάνιση Καταναλωτή (No-Show)
 router.put('/:id/no-show', verifyToken, requestsController.noShowRequest);
 
-// ΚΡΙΣΙΜΗ ΔΙΟΡΘΩΣΗ: Προστέθηκε το export για να μην κρασάρει ο server!
+
+
+// Προστέθηκε το export για να μην κρασάρει ο server!
 module.exports = router;

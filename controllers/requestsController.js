@@ -1,7 +1,8 @@
 const db = require('../models/db');
 
+
+
 // ===== 1. ΛΗΨΗ ΑΙΤΗΜΑΤΩΝ (GET) =====
-// Φέρνουμε ΟΛΑ τα αιτήματα (εκκρεμή και εγκεκριμένα που περιμένουν παράδοση)
 const getCookRequests = (req, res) => {
     const cook_id = req.user.user_id;
 
@@ -12,7 +13,7 @@ const getCookRequests = (req, res) => {
         FROM requests r
                  JOIN listings l ON r.listing_id = l.listing_id
                  JOIN users u ON r.consumer_id = u.user_id
-        WHERE l.cook_id = ? AND r.status IN ('pending', 'approved') AND r.is_delivered = 0
+        WHERE l.cook_id = ? AND r.status IN ('pending', 'approved') AND r.is_delivered = 'pending'
         ORDER BY r.created_at DESC
     `;
 
@@ -41,7 +42,6 @@ const approveRequest = (req, res) => {
                     return db.rollback(() => res.status(400).json({ message: 'Δυστυχώς το φαγητό εξαντλήθηκε!' }));
                 }
 
-                // Αλλάζουμε το status σε approved και μειώνουμε τη μερίδα κατά 1 (Β3)
                 db.query('UPDATE requests SET status = "approved" WHERE request_id = ?', [request_id], (err) => {
                     if (err) return db.rollback(() => res.status(500).json({ message: 'Αποτυχία έγκρισης' }));
 
@@ -68,38 +68,33 @@ const rejectRequest = (req, res) => {
     });
 };
 
-// ===== 4. ΕΠΙΒΕΒΑΙΩΣΗ ΠΑΡΑΛΑΒΗΣ (PUT - Β3) =====
+// ===== 4. ΕΠΙΒΕΒΑΙΩΣΗ ΠΑΡΑΛΑΒΗΣ (PUT) =====
 const confirmDelivery = (req, res) => {
     const request_id = req.params.id;
 
-    // Σημειώνουμε ότι παραλήφθηκε επιτυχώς
-    db.query('UPDATE requests SET is_delivered = 1, status = "completed" WHERE request_id = ?', [request_id], (err) => {
+    db.query('UPDATE requests SET is_delivered = "received", status = "approved" WHERE request_id = ?', [request_id], (err) => {
         if (err) return res.status(500).json({ message: 'Σφάλμα κατά την επιβεβαίωση' });
         return res.json({ message: 'Η μερίδα παραδόθηκε επιτυχώς! 📦' });
     });
 };
 
-// ===== 5. ΜΗ ΠΑΡΑΛΑΒΗ / NO SHOW (PUT - Β3) =====
+// ===== 5. ΜΗ ΠΑΡΑΛΑΒΗ / NO SHOW (PUT) =====
 const noShowRequest = (req, res) => {
     const request_id = req.params.id;
 
     db.beginTransaction((err) => {
         if (err) return res.status(500).json({ message: 'Σφάλμα συναλλαγής' });
 
-        // Βρίσκουμε ποιος είναι ο καταναλωτής (consumer_id) για να του μειώσουμε τους πόντους
         db.query('SELECT consumer_id, listing_id FROM requests WHERE request_id = ?', [request_id], (err, results) => {
             if (err || results.length === 0) return db.rollback(() => res.status(500).json({ message: 'Το αίτημα δεν βρέθηκε' }));
             const { consumer_id, listing_id } = results[0];
 
-            // Ακυρώνουμε το αίτημα
-            db.query('UPDATE requests SET status = "no_show" WHERE request_id = ?', [request_id], (err) => {
+            db.query('UPDATE requests SET is_delivered = "no_show" WHERE request_id = ?', [request_id], (err) => {
                 if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα ενημέρωσης αιτήματος' }));
 
-                // Επιστρέφουμε τη μερίδα πίσω, αφού δεν παραλήφθηκε
                 db.query('UPDATE listings SET available_portions = available_portions + 1 WHERE listing_id = ?', [listing_id], (err) => {
                     if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα επιστροφής μερίδας' }));
 
-                    // Μειώνουμε τους πόντους αυτού που δεν παρέλαβε κατά 1 (Β3: "μειώνονται οι πόντοι αυτού που δεν παρέλαβε κατά 1")
                     db.query('UPDATE users SET credits = credits - 1 WHERE user_id = ?', [consumer_id], (err) => {
                         if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα μείωσης πόντων' }));
 
@@ -114,4 +109,5 @@ const noShowRequest = (req, res) => {
     });
 };
 
+// ΠΡΟΣΟΧΗ: Προσθέσαμε το createRequest στα exports!
 module.exports = { getCookRequests, approveRequest, rejectRequest, confirmDelivery, noShowRequest };
