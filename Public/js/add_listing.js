@@ -1,8 +1,32 @@
-// ========================================================
-// add_listing.js - Ολοκληρωμένη Δημιουργία Αγγελίας με Εικόνα
-// ========================================================
+let mapLat = null;
+let mapLng = null;
+let addMarker = null;
 
-const API_URL = ''; // Αφήνουμε κενό για να παίρνει αυτόματα το τρέχον host (localhost:8080)
+document.addEventListener('DOMContentLoaded', () => {
+    // Αρχικοποίηση χάρτη (π.χ. με κέντρο το Πανεπιστήμιο)
+    const initialCoords = [38.2881, 21.7885];
+    const map = L.map('addListingMap').setView(initialCoords, 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    // Όταν ο χρήστης κάνει κλικ στον χάρτη
+    map.on('click', function(e) {
+        mapLat = e.latlng.lat;
+        mapLng = e.latlng.lng;
+
+
+        if (addMarker) {
+            map.removeLayer(addMarker);
+        }
+
+        // Βάλε νέο marker
+        addMarker = L.marker([mapLat, mapLng]).addTo(map);
+    });
+});
+
+const API_URL = ''; // Αφήνουμε κενό για να παίρνει αυτόματα το τρέχον host
 
 document.getElementById('addListingForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -26,12 +50,22 @@ document.getElementById('addListingForm').addEventListener('submit', async (e) =
     // 2. Χρήση FormData για την υποστήριξη αποστολής αρχείου (Multipart/Form-Data)
     const formData = new FormData();
 
+    if (!mapLat || !mapLng) {
+        errorDiv.classList.remove('d-none');
+        errorDiv.textContent = 'Παρακαλώ επιλέξτε το ακριβές σημείο στον χάρτη κάνοντας κλικ.';
+        return; // Σταματάμε την υποβολή της φόρμας
+    }
+
+
     // Προσθήκη των βασικών κειμένων και αριθμών
     formData.append('title', document.getElementById('title').value.trim());
     formData.append('total_portions', parseInt(document.getElementById('total_portions').value));
     formData.append('pickup_location', document.getElementById('pickup_location').value.trim());
     formData.append('pickup_time', document.getElementById('pickup_time').value.trim());
     formData.append('description', document.getElementById('description').value.trim());
+
+    formData.append('latitude', mapLat);
+    formData.append('longitude', mapLng);
 
     // 3. Προσθήκη του αρχείου εικόνας (αν έχει επιλεγεί από τον χρήστη - Προαιρετικό!)
     const imageInput = document.getElementById('image');

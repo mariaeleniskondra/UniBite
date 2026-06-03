@@ -3,7 +3,7 @@ const db = require('../models/db');
 // ===== 1. ΔΗΜΙΟΥΡΓΙΑ ΝΕΑΣ ΑΓΓΕΛΙΑΣ ΜΕ ΕΙΚΟΝΑ (POST) =====
 const createListing = (req, res) => {
     try {
-        const { title, description, total_portions, pickup_location, pickup_time, allergens } = req.body || {};
+        const { title, description, total_portions, pickup_location,latitude, longitude, pickup_time, allergens } = req.body || {};
         const cook_id = req.user ? req.user.user_id : null;
 
         if (!cook_id) return res.status(401).json({ message: 'Μη εξουσιοδοτημένος χρήστης.' });
@@ -26,13 +26,13 @@ const createListing = (req, res) => {
         }
 
         const queryListing = `
-            INSERT INTO listings (cook_id, title, description, image_url, total_portions, available_portions, pickup_location, pickup_time, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')
+            INSERT INTO listings (cook_id, title, description, image_url, total_portions, available_portions, pickup_location, latitude, longitude, pickup_time, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?, 'active')
         `;
 
         db.query(
             queryListing,
-            [cook_id, title, description, image_url, cleanPortions, cleanPortions, pickup_location, pickup_time],
+            [cook_id, title, description, image_url, cleanPortions, cleanPortions, pickup_location, latitude, longitude, pickup_time],
             (err, result) => {
                 if (err) {
                     console.error("MYSQL INSERT LISTING ERROR:", err);
