@@ -22,6 +22,55 @@ const getCookRequests = (req, res) => {
     });
 };
 
+
+// ===== 0. ΔΗΜΙΟΥΡΓΙΑ ΝΕΟΥ ΑΙΤΗΜΑΤΟΣ / ΚΡΑΤΗΣΗΣ (POST) =====
+// Αυτή είναι η λειτουργία που έλειπε και ζήτησε ο συνάδελφος!
+const createRequest = (req, res) => {
+    const { listing_id } = req.body;
+    const consumer_id = req.user.user_id; // Παίρνουμε το ID του φοιτητή από το JWT Token
+
+    if (!listing_id) {
+        return res.status(400).json({ message: 'Δεν δόθηκε το ID της αγγελίας.' });
+    }
+
+    // 1. Έλεγχος αν ο φοιτητής έχει αρκετούς πόντους (credits) για να κάνει κράτηση
+    db.query('SELECT credits FROM users WHERE user_id = ?', [consumer_id], (err, userResults) => {
+        if (err || userResults.length === 0) {
+            return res.status(500).json({ message: 'Σφάλμα κατά τον έλεγχο των πόντων του χρήστη.' });
+        }
+
+        if (userResults[0].credits <= 0) {
+            return res.status(400).json({ message: 'Δεν έχεις αρκετούς πόντους (credits) για να κάνεις κράτηση! ❌' });
+        }
+
+        // 2. Έλεγχος αν υπάρχουν διαθέσιμες μερίδες στην αγγελία
+        db.query('SELECT available_portions, cook_id FROM listings WHERE listing_id = ? AND status = "active"', [listing_id], (err, listingResults) => {
+            if (err || listingResults.length === 0) {
+                return res.status(404).json({ message: 'Η αγγελία δεν βρέθηκε ή δεν είναι πλέον ενεργή.' });
+            }
+
+            const { available_portions, cook_id } = listingResults[0];
+
+            // Απαγόρευση: Δεν μπορείς να κάνεις κράτηση στο δικό σου φαγητό!
+            if (cook_id === consumer_id) {
+                return res.status(400).json({ message: 'Δεν μπορείς να κάνεις κράτηση στο δικό σου φαγητό!' });
+            }
+
+            if (available_portions <= 0) {
+                return res.status(400).json({ message: 'Δυστυχώς, οι μερίδες για αυτό το φαγητό εξαντλήθηκαν!' });
+            }
+
+            // 3. Εισαγωγή του αιτήματος στον πίνακα requests με κατάσταση 'pending'
+            const insertQuery = 'INSERT INTO requests (listing_id, consumer_id, status, is_delivered) VALUES (?, ?, "pending", "pending")';
+            db.query(insertQuery, [listing_id, consumer_id], (err, result) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Αποτυχία δημιουργίας αιτήματος κράτησης.' });
+                }
+                return res.status(201).json({ message: 'Το αίτημα κράτησης στάλθηκε επιτυχώς στον μάγειρα! 🍳', request_id: result.insertId });
+            });
+        });
+    });
+};
 // ===== 2. ΕΓΚΡΙΣΗ ΑΙΤΗΜΑΤΟΣ (PUT) =====
 const approveRequest = (req, res) => {
     const request_id = req.params.id;
@@ -114,4 +163,4 @@ const noShowRequest = (req, res) => {
     });
 };
 
-module.exports = { getCookRequests, approveRequest, rejectRequest, confirmDelivery, noShowRequest };
+module.exports = { createRequest, getCookRequests, approveRequest, rejectRequest, confirmDelivery, noShowRequest };

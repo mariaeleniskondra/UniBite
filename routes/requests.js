@@ -22,5 +22,7 @@ router.put('/:id/confirm-delivery', verifyToken, requestsController.confirmDeliv
 // Μη Εμφάνιση Καταναλωτή (No-Show)
 router.put('/:id/no-show', verifyToken, requestsController.noShowRequest);
 
-// ΚΡΙΣΙΜΗ ΔΙΟΡΘΩΣΗ: Προστέθηκε το export για να μην κρασάρει ο server!
+router.post('/', verifyToken, requestsController.createRequest);
+
+
 module.exports = router;

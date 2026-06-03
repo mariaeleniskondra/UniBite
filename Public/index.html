@@ -1,141 +1,74 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Feed - UniBite</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Αρχική - UniBite</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* Ορίζουμε υποχρεωτικά ύψος για το box του χάρτη, αλλιώς δεν θα φαίνεται */
+    #map {
+      height: calc(100vh - 140px);
+      position: sticky;
+      top: 100px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 1;
+    }
+    .meal-feed-card {
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+    .meal-feed-card:hover {
+      transform: translateY(-5px);
+    }
+  </style>
 </head>
-<body>
+<body class="bg-light">
 
 <nav class="unibite-nav">
-    <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
-      <div class="brand">UniBite</div>
-      <div class="nav-actions">
-        <a href="index.html" class="nav-btn active text-decoration-none">Feed</a>
-        <a href="add_listing.html" class="nav-btn text-decoration-none">Δώσε Φαγητό</a>
-        <a href="profile.html" class="nav-btn text-decoration-none">Προφίλ</a>
-        <a href="login.html" class="nav-btn text-decoration-none">Αποσύνδεση</a>
-      </div>
-    </div>
-  </nav>
-  
-  <div class="filter-bar">
-    <div class="container py-3">
-      <div class="row align-items-end g-3">
-        <div class="col-12 col-md-4 col-lg-3">
-          <label for="locationInput" class="form-label filter-label">Τοποθεσία</label>
-          <input type="text" id="locationInput" class="form-control filter-input" placeholder="π.χ. Πολυτεχνείο">
-        </div>
-        <div class="col-12 col-md-3 col-lg-3">
-          <label for="distanceFilter" class="form-label filter-label">Απόσταση</label>
-          <select id="distanceFilter" class="form-select filter-select">
-            <option value="1km">1 km</option>
-            <option value="3km">3 km</option>
-            <option value="5km">5 km</option>
-            <option value="all">Όλα</option>
-          </select>
-        </div>
-        <div class="col-12 col-md-3 col-lg-3">
-          <label for="sortFilter" class="form-label filter-label">Ταξινόμηση</label>
-          <select id="sortFilter" class="form-select filter-select">
-            <option value="nearest">Πιο κοντά</option>
-            <option value="newest">Πιο πρόσφατα</option>
-          </select>
-        </div>
-        <div class="col-12 col-md-2 col-lg-3">
-          <button class="btn filter-btn w-100">Φίλτρο</button>
-        </div>
-      </div>
+  <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div class="brand">🏆 UniBite</div>
+    <div class="nav-actions">
+      <a href="index.html" class="nav-btn active text-decoration-none">🛒 Θέλω να Φάω (Feed)</a>
+      <a href="cook_dashboard.html" class="nav-btn text-decoration-none">👨‍🍳 Πίνακας Μάγειρα</a>
+      <a href="add_listing.html" class="nav-btn text-decoration-none">+ Δώσε Φαγητό</a>
+      <a href="profile.html" class="nav-btn text-decoration-none">👤 Προφίλ</a>
+      <a href="login.html" class="nav-btn text-decoration-none" onclick="localStorage.removeItem('token')">Αποσύνδεση</a>
     </div>
   </div>
+</nav>
 
-  <main class="container main-area">
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-      <h1 class="page-title">Διαθέσιμα Γεύματα Σήμερα</h1>
-      <div class="points-badge">Οι πόντοι σας: 5</div>
-    </div>
+<div class="container main-area my-4">
+  <div class="row g-4">
 
-    <div class="row g-4">
-      <div class="col-12 col-lg-8">
-        <div class="row g-4">
-          <div class="col-12 col-md-6">
-            <div class="meal-card">
-              <div class="card-top">
-                <span class="status active">Ενεργή</span>
-                <span class="emoji">🥘</span>
-              </div>
-              <h3 class="meal-title">Μουσακάς με μελιτζάνα</h3>
-              <div class="meal-meta">Από: Γιώργος (Εστία Β')</div>
-              <p class="meal-desc">Μου περίσσεψαν 3 μερίδες, ελάτε να πάρετε! Είναι ακόμα ζεστά.</p>
-              <div class="detail-row"><strong>Μερίδες:</strong> 3 διαθέσιμες</div>
-              <div class="detail-row"><strong>Ώρα:</strong> 13:00 - 14:00</div>
-              <div class="detail-row"><strong>Αλλεργιογόνα:</strong> Γάλα, Γλουτένη</div>
-              <button class="primary-btn">Δέσμευση Μερίδας (1 Πόντος)</button>
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6">
-            <div class="meal-card">
-              <div class="card-top">
-                <span class="status active">Ενεργή</span>
-                <span class="emoji">🍲</span>
-              </div>
-              <h3 class="meal-title">Φακές σούπα</h3>
-              <div class="meal-meta">Από: Μαρία (Πολυτεχνείο)</div>
-              <p class="meal-desc">Παρακαλώ να έχετε δικό σας τάπερ. Ιδανικό για vegan!</p>
-              <div class="detail-row"><strong>Μερίδες:</strong> 1 διαθέσιμη</div>
-              <div class="detail-row"><strong>Ώρα:</strong> 12:30 - 13:30</div>
-              <div class="detail-row"><strong>Αλλεργιογόνα:</strong> Κανένα</div>
-              <button class="primary-btn">Δέσμευση Μερίδας (1 Πόντος)</button>
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6">
-            <div class="meal-card inactive">
-              <div class="card-top">
-                <span class="status inactive">Εξαντλήθηκε</span>
-                <span class="emoji">🍝</span>
-              </div>
-              <h3 class="meal-title muted">Παστίτσιο</h3>
-              <div class="meal-meta muted">Από: Νίκος (Εστία Α')</div>
-              <p class="meal-desc muted">Δόθηκαν όλες οι μερίδες. Ευχαριστώ!</p>
-              <button class="secondary-btn" disabled>Μη Διαθέσιμο</button>
-            </div>
-          </div>
-        </div>
+    <div class="col-12 col-lg-6">
+      <div class="mb-4">
+        <h2 class="fw-bold" style="color: var(--deep-purple);">Διαθέσιμα Γεύματα Φοιτητών</h2>
+        <p class="text-muted">Βρες σπιτικό φαγητό που διατίθεται δωρεάν στην κοινότητα του Πανεπιστημίου.</p>
       </div>
 
-      <div class="col-12 col-lg-4 mt-4 mt-lg-0">
-        <div class="map-box">
-          <div id="map" class="map-placeholder"></div>
-        </div>
+      <div id="mealFeedContainer" class="d-flex flex-column gap-3">
+        <p class="text-muted text-center p-4">Φόρτωση διαθέσιμων γευμάτων...</p>
       </div>
     </div>
-  </main>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    const offers = [
-      { title: "Μουσακάς με μελιτζάνα", by: "Γιώργος (Εστία Β')", lat: 38.2562, lng: 21.7426 },
-      { title: "Φακές σούπα", by: "Μαρία (Πολυτεχνείο)", lat: 38.2466, lng: 22.7346 },
-      { title: "Παστίτσιο", by: "Νίκος (Εστία Α')", lat: 38.2410, lng: 21.7290 }
-    ];
+    <div class="col-12 col-lg-6">
+      <div id="map"></div>
+    </div>
 
-    const map = L.map('map').setView([38.2466, 21.7346], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+  </div>
+</div>
 
-    offers.forEach(offer => {
-      L.marker([offer.lat, offer.lng]).addTo(map)
-        .bindPopup(`<strong>${offer.title}</strong><br>${offer.by}`);
-    });
-  </script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="js/index.js"></script>
 </body>
 </html>

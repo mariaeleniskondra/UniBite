@@ -19,7 +19,8 @@ const listingRoutes = require('./routes/listings');
 // Σύνδεση του route με το πρόθεμα /api/listings
 app.use('/api/listings', listingRoutes);
 app.use('/api/admin', require('./routes/admin'));
-
+app.use('/api/ratings', require('./routes/ratings'));
+app.use('/api/meals', require('./routes/meals'));
 // 2. ΜΕΤΑ ΣΕΡΒΙΡΟΥΜΕ ΤΑ ΣΤΑΤΙΚΑ ΑΡΧΕΙΑ (Θωρακισμένο path)
 app.use(express.static(path.join(__dirname, 'Public')));
 
