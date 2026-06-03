@@ -79,7 +79,7 @@ CREATE TABLE ratings (
 );
 
 -- ============================================================
--- ΕΙΣΑΓΩΓΗ ΑΛΛΕΡΓΙΟΓΟΝΩΝ (14 βασικά)
+-- ΑΛΛΕΡΓΙΟΓΟΝΑ
 -- ============================================================
 INSERT INTO allergens (name) VALUES
                                  ('Celery'), ('Cereals containing gluten'), ('Crustaceans'), ('Eggs'),
@@ -87,33 +87,33 @@ INSERT INTO allergens (name) VALUES
                                  ('Nuts'), ('Peanuts'), ('Sesame seeds'), ('Soya'), ('Sulphur dioxide and sulphites');
 
 -- ============================================================
--- ΕΙΣΑΓΩΓΗ ΧΡΗΣΤΩΝ
--- Κωδικός για ΟΛΟΥΣ τους φοιτητές : student123
--- Κωδικός για ΟΛΟΥΣ τους admins   : admin123
+-- ΧΡΗΣΤΕΣ
+-- φοιτητές: student123 | admins: admin123
 -- ============================================================
 INSERT INTO users (username, email, password_hash, role, credits) VALUES
-                                                                      -- ΦΟΙΤΗΤΕΣ (password: student123)
                                                                       ('giorgos_p',   'p210045@upatras.gr',  '$2b$10$Sg6zMb6zHcF0IZ0VkPA7BeD6.HdA.w6kArHhflw2K3VV09DtEiuYi', 'student', 10),
                                                                       ('maria_k',     'p210892@upatras.gr',  '$2b$10$Sg6zMb6zHcF0IZ0VkPA7BeD6.HdA.w6kArHhflw2K3VV09DtEiuYi', 'student', 8),
                                                                       ('nikos_a',     'p220111@upatras.gr',  '$2b$10$Sg6zMb6zHcF0IZ0VkPA7BeD6.HdA.w6kArHhflw2K3VV09DtEiuYi', 'student', 0),
                                                                       ('eleni_m',     'p230012@upatras.gr',  '$2b$10$Sg6zMb6zHcF0IZ0VkPA7BeD6.HdA.w6kArHhflw2K3VV09DtEiuYi', 'student', 5),
                                                                       ('kiriakos_s',  'p220555@upatras.gr',  '$2b$10$Sg6zMb6zHcF0IZ0VkPA7BeD6.HdA.w6kArHhflw2K3VV09DtEiuYi', 'student', 5),
-                                                                      -- ADMINS (password: admin123)  → redirect στο admin.html
-                                                                      ('admin_panos', 'admin1@upatras.gr',   '$2b$10$VrZvZXdHiKz79fIv0tfuZuNi09JEGJixuoKeM1U08UwuIxn.lbxQa', 'admin',   14),
-                                                                      ('admin_anna',  'admin2@upatras.gr',   '$2b$10$VrZvZXdHiKz79fIv0tfuZuNi09JEGJixuoKeM1U08UwuIxn.lbxQa', 'admin',   5);
+                                                                      ('admin_panos', 'admin1@upatras.gr',   '$2b$10$VrZvZXdHiKz79fIv0tfuZuNi09JEGJixuoKeM1U08UwuIxn.lbxQa', 'admin',   0),
+                                                                      ('admin_anna',  'admin2@upatras.gr',   '$2b$10$VrZvZXdHiKz79fIv0tfuZuNi09JEGJixuoKeM1U08UwuIxn.lbxQa', 'admin',   0);
 
 -- ============================================================
--- ΕΙΣΑΓΩΓΗ ΑΓΓΕΛΙΩΝ (LISTINGS)
+-- ΑΓΓΕΛΙΕΣ
+-- listing_id 1,2,3 → active
+-- listing_id 4     → inactive (0 μερίδες, γκριζαρισμένη στο feed)
+-- listing_id 5     → deleted  (για στατιστικά admin)
 -- ============================================================
 INSERT INTO listings (cook_id, title, description, total_portions, available_portions, pickup_location, pickup_time, status) VALUES
-                                                                                                                                 (1, 'Παστίτσιο της γιαγιάς',  'Κλασική συνταγή με μπεσαμέλ.',               5, 2, 'Φοιτητική Εστία Β, Δωμάτιο 42',  '14:00 - 15:00', 'active'),
-                                                                                                                                 (1, 'Φασολάκια λαδερά',        'Φρέσκα φασολάκια με πατάτες.',               4, 1, 'Φοιτητική Εστία Β, Δωμάτιο 42',  '13:30 - 14:30', 'active'),
-                                                                                                                                 (2, 'Γεμιστά με ρύζι',         'Παραδοσιακά γεμιστά, ιδανικά για vegan.',    4, 2, 'Κτήριο Πολυτεχνικής',            '12:30 - 13:30', 'active'),
-                                                                                                                                 (3, 'Φακές βελουτέ',           'Σούπα φακές με καρότο και σέλινο.',          3, 0, 'Φοιτητική Εστία Α',              '13:00 - 14:00', 'inactive'),
-                                                                                                                                 (4, 'Μακαρόνια με κιμά',       'Σπαγγέτι με φρέσκο μοσχαρίσιο κιμά.',       6, 3, 'Πλατεία Όλγας',                  '15:00 - 16:00', 'active');
+                                                                                                                                 (1, 'Παστίτσιο της γιαγιάς', 'Κλασική συνταγή με μπεσαμέλ.',            5, 2, 'Φοιτητική Εστία Β, Δωμάτιο 42', '14:00 - 15:00', 'active'),
+                                                                                                                                 (1, 'Φασολάκια λαδερά',      'Φρέσκα φασολάκια με πατάτες.',            4, 1, 'Φοιτητική Εστία Β, Δωμάτιο 42', '13:30 - 14:30', 'active'),
+                                                                                                                                 (2, 'Γεμιστά με ρύζι',       'Παραδοσιακά γεμιστά, ιδανικά για vegan.', 4, 2, 'Κτήριο Πολυτεχνικής',           '12:30 - 13:30', 'active'),
+                                                                                                                                 (3, 'Φακές βελουτέ',         'Σούπα φακές με καρότο και σέλινο.',       3, 0, 'Φοιτητική Εστία Α',             '13:00 - 14:00', 'inactive'),
+                                                                                                                                 (4, 'Μακαρόνια με κιμά',     'Σπαγγέτι με φρέσκο μοσχαρίσιο κιμά.',    6, 3, 'Πλατεία Όλγας',                 '15:00 - 16:00', 'deleted');
 
 -- ============================================================
--- ΕΙΣΑΓΩΓΗ ΑΙΤΗΜΑΤΩΝ (REQUESTS)
+-- ΑΙΤΗΜΑΤΑ — όλα με listing_id που υπάρχουν (1,2,3,4,5)
 -- ============================================================
 INSERT INTO requests (listing_id, consumer_id, status, is_delivered) VALUES
                                                                          (1, 2, 'approved', 'received'),
@@ -126,7 +126,7 @@ INSERT INTO requests (listing_id, consumer_id, status, is_delivered) VALUES
                                                                          (5, 5, 'approved', 'received');
 
 -- ============================================================
--- ΕΙΣΑΓΩΓΗ ΑΞΙΟΛΟΓΗΣΕΩΝ (RATINGS)
+-- ΑΞΙΟΛΟΓΗΣΕΙΣ
 -- ============================================================
 INSERT INTO ratings (request_id, rating_value, comments) VALUES
                                                              (1, 5, 'Τέλειο!'),
