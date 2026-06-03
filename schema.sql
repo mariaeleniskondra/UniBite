@@ -95,12 +95,12 @@ INSERT INTO users (username, email, password_hash, role, credits) VALUES
                                                                       -- ΦΟΙΤΗΤΕΣ (password: student123)
                                                                       ('giorgos_p',   'p210045@upatras.gr',  '$2b$10$Sg6zMb6zHcF0IZ0VkPA7BeD6.HdA.w6kArHhflw2K3VV09DtEiuYi', 'student', 10),
                                                                       ('maria_k',     'p210892@upatras.gr',  '$2b$10$Sg6zMb6zHcF0IZ0VkPA7BeD6.HdA.w6kArHhflw2K3VV09DtEiuYi', 'student', 8),
-                                                                      ('nikos_a',     'p220111@upatras.gr',  '$2b$10$Sg6zMb6zHcF0IZ0VkPA7BeD6.HdA.w6kArHhflw2K3VV09DtEiuYi', 'student', 6),
+                                                                      ('nikos_a',     'p220111@upatras.gr',  '$2b$10$Sg6zMb6zHcF0IZ0VkPA7BeD6.HdA.w6kArHhflw2K3VV09DtEiuYi', 'student', 0),
                                                                       ('eleni_m',     'p230012@upatras.gr',  '$2b$10$Sg6zMb6zHcF0IZ0VkPA7BeD6.HdA.w6kArHhflw2K3VV09DtEiuYi', 'student', 5),
                                                                       ('kiriakos_s',  'p220555@upatras.gr',  '$2b$10$Sg6zMb6zHcF0IZ0VkPA7BeD6.HdA.w6kArHhflw2K3VV09DtEiuYi', 'student', 5),
                                                                       -- ADMINS (password: admin123)  → redirect στο admin.html
-                                                                      ('admin_panos', 'admin1@upatras.gr',   '$2b$10$VrZvZXdHiKz79fIv0tfuZuNi09JEGJixuoKeM1U08UwuIxn.lbxQa', 'admin',   0),
-                                                                      ('admin_anna',  'admin2@upatras.gr',   '$2b$10$VrZvZXdHiKz79fIv0tfuZuNi09JEGJixuoKeM1U08UwuIxn.lbxQa', 'admin',   0);
+                                                                      ('admin_panos', 'admin1@upatras.gr',   '$2b$10$VrZvZXdHiKz79fIv0tfuZuNi09JEGJixuoKeM1U08UwuIxn.lbxQa', 'admin',   14),
+                                                                      ('admin_anna',  'admin2@upatras.gr',   '$2b$10$VrZvZXdHiKz79fIv0tfuZuNi09JEGJixuoKeM1U08UwuIxn.lbxQa', 'admin',   5);
 
 -- ============================================================
 -- ΕΙΣΑΓΩΓΗ ΑΓΓΕΛΙΩΝ (LISTINGS)

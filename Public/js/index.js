@@ -4,9 +4,8 @@ let userLat = null;
 let userLng = null;
 let userMarker = null;
 
-// sinartisi Haversine gia ipologismo apostasis 2 simion se km
 function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // aktina tis gis se km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -16,11 +15,8 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
-
 document.addEventListener('DOMContentLoaded', () => {
-    //arxikopoiisi xarti
     initMap();
-
     fetchAvailableMeals();
 
     const getLocationBtn = document.getElementById('getLocationBtn');
@@ -34,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     userLat = position.coords.latitude;
                     userLng = position.coords.longitude;
                     textLabel.innerHTML = "<span class='text-success fw-bold'>Η τοποθεσία βρέθηκε!</span>";
-
                     document.getElementById('applyFiltersBtn').disabled = false;
 
                     if (userMarker) { map.removeLayer(userMarker); }
@@ -50,47 +45,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
     if (applyFiltersBtn) {
         applyFiltersBtn.addEventListener('click', () => {
-            fetchAvailableMeals(); // Φορτώνει πάλι τα γεύματα, αλλά τώρα θα εφαρμόσει τα φίλτρα!
+            fetchAvailableMeals();
         });
     }
 });
 
 function initMap() {
-
     const patrasUniversityCoords = [38.2881, 21.7885];
-
-
     map = L.map('map').setView(patrasUniversityCoords, 15);
-
-
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
-
-
     markersGroup = L.layerGroup().addTo(map);
 }
 
-// Ένας βοηθητικός χάρτης (Geocoding Mapper) για να μετατρέπουμε τα κείμενα τοποθεσίας σε συντεταγμένες
 const locationCoordinates = {
     'Φοιτητική Εστία Β, Δωμάτιο 42': [38.2912, 21.7890],
     'Φοιτητική Εστία Β': [38.2912, 21.7890],
     'Κτήριο Πολυτεχνικής': [38.2865, 21.7860],
     'Φοιτητική Εστία Α': [38.2930, 21.7915],
-    'Πλατεία Όλγας': [38.2462, 21.7375] // Για την περίπτωση που κάποιος μένει κέντρο
+    'Πλατεία Όλγας': [38.2462, 21.7375]
 };
 
 function fetchAvailableMeals() {
-
     fetch('/api/meals')
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Αποτυχία λήψης γευμάτων');
-            }
+            if (!response.ok) throw new Error('Αποτυχία λήψης γευμάτων');
             return response.json();
         })
         .then(meals => {
@@ -98,77 +81,99 @@ function fetchAvailableMeals() {
             feedContainer.innerHTML = '';
             markersGroup.clearLayers();
 
-
-            let activeMeals = meals.filter(meal => meal.status === 'active' && meal.available_portions > 0);
+            // ΦΙΛΤΡΑΡΙΣΜΟς: active ΚΑΙ inactive (όχι deleted)
+            // Οι active εμφανίζονται κανονικά, οι inactive γκριζαρισμένες
+            let visibleMeals = meals.filter(meal => meal.status !== 'deleted');
 
             if (userLat !== null && userLng !== null) {
                 const maxDist = parseFloat(document.getElementById('maxDistance').value) || 5;
                 const maxRes = parseInt(document.getElementById('maxResults').value) || 10;
 
-                // 1. Υπολογισμός απόστασης
-                activeMeals.forEach(meal => {
+                visibleMeals.forEach(meal => {
                     const mLat = meal.latitude || 38.2881;
                     const mLng = meal.longitude || 21.7885;
                     meal.distance = calculateDistance(userLat, userLng, mLat, mLng);
                 });
 
-                // 2. Κόβουμε όσα είναι πιο μακριά από τη μέγιστη απόσταση
-                activeMeals = activeMeals.filter(meal => meal.distance <= maxDist);
-
-                // 3. Ταξινόμηση (από το πιο κοντινό στο πιο μακρινό)
-                activeMeals.sort((a, b) => a.distance - b.distance);
-
-                // 4. Περιορισμός αριθμού αποτελεσμάτων (limit)
-                activeMeals = activeMeals.slice(0, maxRes);
+                visibleMeals = visibleMeals.filter(meal => meal.distance <= maxDist);
+                visibleMeals.sort((a, b) => a.distance - b.distance);
+                visibleMeals = visibleMeals.slice(0, maxRes);
             }
 
-            if (activeMeals.length === 0) {
+            if (visibleMeals.length === 0) {
                 feedContainer.innerHTML = '<p class="text-muted text-center p-4">Δεν υπάρχουν διαθέσιμα γεύματα αυτή τη στιγμή.</p>';
                 return;
             }
 
+            visibleMeals.forEach(meal => {
+                // Αν είναι inactive: γκριζαρισμένη κάρτα, χωρίς κουμπί κράτησης
+                const isInactive = meal.status === 'inactive' || meal.available_portions === 0;
 
-            activeMeals.forEach(meal => {
                 const distanceBadge = meal.distance !== undefined
                     ? `<span class="badge bg-info text-dark mb-2">📍 ${meal.distance.toFixed(1)} km μακριά</span>`
                     : '';
 
+                // Διαφορετικό στυλ για inactive
+                const cardStyle = isInactive
+                    ? 'opacity: 0.5; filter: grayscale(80%);'
+                    : '';
+
+                const portionsBadge = isInactive
+                    ? `<span class="badge bg-secondary fs-6 rounded-pill px-3 py-2">${meal.available_portions} / ${meal.total_portions}</span>`
+                    : `<span class="badge bg-success fs-6 rounded-pill px-3 py-2">${meal.available_portions} / ${meal.total_portions}</span>`;
+
+                const bookButton = isInactive
+                    ? `<button class="btn btn-sm btn-secondary mt-3 px-3 rounded-pill fw-bold" disabled>Εξαντλήθηκε</button>`
+                    : `<button class="btn btn-sm btn-primary mt-3 px-3 rounded-pill fw-bold" onclick="bookMeal(event, ${meal.listing_id})">Κράτηση</button>`;
+
+                const inactiveBadge = isInactive
+                    ? `<span class="badge bg-secondary mb-2 ms-1">Εξαντλήθηκε</span>`
+                    : '';
+
                 const mealCard = `
-                    <div class="card meal-feed-card shadow-sm border-0 p-3 rounded-4 mb-3" onclick="focusOnMeal(${meal.listing_id})">
+                    <div class="card meal-feed-card shadow-sm border-0 p-3 rounded-4 mb-3" 
+                         style="${cardStyle}" 
+                         onclick="${!isInactive ? `focusOnMeal(${meal.listing_id})` : ''}">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <span class="badge bg-purple-light text-purple mb-2">🍲 Σπιτικό Γεύμα</span>
+                                <div class="mb-2">
+                                    <span class="badge bg-purple-light text-purple">🍲 Σπιτικό Γεύμα</span>
+                                    ${inactiveBadge}
+                                </div>
+                                ${distanceBadge}
                                 <h5 class="fw-bold mb-1 text-dark">${meal.title}</h5>
-                                <p class="small text-muted mb-2">${meal.description}</p>
+                                <p class="small text-muted mb-2">${meal.description || ''}</p>
                                 <div class="d-flex flex-column gap-1 small text-secondary">
                                     <span>📍 <strong>Τοποθεσία:</strong> ${meal.pickup_location}</span>
                                     <span>🕒 <strong>Ώρα Παραλαβής:</strong> ${meal.pickup_time}</span>
                                 </div>
                             </div>
                             <div class="text-end">
-                                <span class="badge bg-success fs-6 rounded-pill px-3 py-2">${meal.available_portions} / ${meal.total_portions}</span>
+                                ${portionsBadge}
                                 <div class="small text-muted mt-1">μερίδες</div>
-                                <button class="btn btn-sm btn-primary mt-3 px-3 rounded-pill fw-bold" onclick="bookMeal(event, ${meal.listing_id})">Κράτηση</button>
+                                ${bookButton}
                             </div>
                         </div>
                     </div>
                 `;
                 feedContainer.innerHTML += mealCard;
 
-                const coords = (meal.latitude && meal.longitude)
-                    ? [meal.latitude, meal.longitude]
-                    : [38.2881, 21.7885];
+                // Marker στον χάρτη μόνο για active αγγελίες
+                if (!isInactive) {
+                    const coords = (meal.latitude && meal.longitude)
+                        ? [meal.latitude, meal.longitude]
+                        : [38.2881, 21.7885];
 
-                const marker = L.marker(coords).bindPopup(`
-                    <div style="font-family: 'Inter', sans-serif;">
-                        <h6 class="fw-bold mb-1">${meal.title}</h6>
-                        <p class="small text-muted mb-1">${meal.pickup_location}</p>
-                        <span class="badge bg-success text-white">Μερίδες: ${meal.available_portions}</span>
-                    </div>
-                `);
-
-                marker.listingId = meal.listing_id;
-                markersGroup.addLayer(marker);
+                    const marker = L.marker(coords).bindPopup(`
+                        <div style="font-family: sans-serif;">
+                            <h6 class="fw-bold mb-1">${meal.title}</h6>
+                            <p class="small text-muted mb-1">${meal.pickup_location}</p>
+                            <span class="badge bg-success text-white">Μερίδες: ${meal.available_portions}</span>
+                        </div>
+                    `);
+                    marker.listingId = meal.listing_id;
+                    markersGroup.addLayer(marker);
+                }
             });
         })
         .catch(error => {
@@ -177,7 +182,6 @@ function fetchAvailableMeals() {
                 '<p class="text-danger text-center p-4">Σφάλμα κατά τη σύνδεση με τον διακομιστή.</p>';
         });
 }
-
 
 function focusOnMeal(listingId) {
     markersGroup.eachLayer(marker => {
@@ -188,49 +192,39 @@ function focusOnMeal(listingId) {
     });
 }
 
-
 function bookMeal(event, listingId) {
-    event.stopPropagation(); // Εμποδίζει το κλικ της κάρτας  από το να ανοίξει το popup του χάρτη ταυτόχρονα
-
+    event.stopPropagation();
 
     const token = localStorage.getItem('token');
     if (!token) {
-        alert('Δεν είστε συνδεδεμένος/η. Παρακαλώ συνδεθείτε για να κάνετε κράτηση.');
-        window.location.href = 'login.html';
+        alert('Δεν είστε συνδεδεμένος/η. Παρακαλώ συνδεθείτε πρώτα.');
+        window.location.href = 'index.html';
         return;
     }
 
-    // parathiro epivevaiosis
     if (!confirm('Θέλετε να προχωρήσετε σε δέσμευση μιας μερίδας από αυτό το γεύμα;')) {
         return;
     }
 
-    // POST sto backend
     fetch('/api/requests', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // Προσθήκη του token για το authMiddleware
+            'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-            listing_id: listingId
-        })
+        body: JSON.stringify({ listing_id: listingId })
     })
         .then(async response => {
             const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.message || 'Αποτυχία κατά την ολοκλήρωση της κράτησης.');
-            }
+            if (!response.ok) throw new Error(data.message || 'Αποτυχία κατά την κράτηση.');
             return data;
         })
         .then(data => {
-            alert('Η κράτηση υποβλήθηκε με επιτυχία! Εκκρεμεί η έγκριση του μάγειρα. ⏳');
-
-            // ananeosi feed kai xarti  live
-            fetchAvailableMeals();
+            alert('Η κράτηση υποβλήθηκε! Εκκρεμεί η έγκριση του μάγειρα. ⏳');
+            fetchAvailableMeals(); // Ανανέωση feed
         })
         .catch(error => {
-            console.error('Error during booking request:', error);
+            console.error('Error during booking:', error);
             alert('Σφάλμα: ' + error.message);
         });
 }
