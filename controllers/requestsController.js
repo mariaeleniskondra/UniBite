@@ -1,7 +1,7 @@
 const db = require('../models/db');
 
-// ===== 1. ΛΗΨΗ ΑΙΤΗΜΑΤΩΝ (GET) =====
-// Φέρνουμε ΟΛΑ τα αιτήματα (εκκρεμή και εγκεκριμένα που περιμένουν παράδοση)
+
+// Φέρνουμε ΟΛΑ τα αιτήματα
 const getCookRequests = (req, res) => {
     const cook_id = req.user.user_id;
 
@@ -12,7 +12,7 @@ const getCookRequests = (req, res) => {
         FROM requests r
                  JOIN listings l ON r.listing_id = l.listing_id
                  JOIN users u ON r.consumer_id = u.user_id
-        WHERE l.cook_id = ? AND r.status IN ('pending', 'approved') AND r.is_delivered = 0
+        WHERE l.cook_id = ? AND r.status IN ('pending', 'approved') AND r.is_delivered = 'pending'
         ORDER BY r.created_at DESC
     `;
 
@@ -23,8 +23,7 @@ const getCookRequests = (req, res) => {
 };
 
 
-// ===== 0. ΔΗΜΙΟΥΡΓΙΑ ΝΕΟΥ ΑΙΤΗΜΑΤΟΣ / ΚΡΑΤΗΣΗΣ (POST) =====
-// Αυτή είναι η λειτουργία που έλειπε και ζήτησε ο συνάδελφος!
+
 const createRequest = (req, res) => {
     const { listing_id } = req.body;
     const consumer_id = req.user.user_id; // Παίρνουμε το ID του φοιτητή από το JWT Token
@@ -122,7 +121,7 @@ const confirmDelivery = (req, res) => {
     const request_id = req.params.id;
 
     // Σημειώνουμε ότι παραλήφθηκε επιτυχώς
-    db.query('UPDATE requests SET is_delivered = 1, status = "completed" WHERE request_id = ?', [request_id], (err) => {
+    db.query('UPDATE requests SET is_delivered = "received" WHERE request_id = ?', [request_id], (err) => {
         if (err) return res.status(500).json({ message: 'Σφάλμα κατά την επιβεβαίωση' });
         return res.json({ message: 'Η μερίδα παραδόθηκε επιτυχώς! 📦' });
     });
