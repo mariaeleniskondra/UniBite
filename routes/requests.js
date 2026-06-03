@@ -24,5 +24,7 @@ router.put('/:id/no-show', verifyToken, requestsController.noShowRequest);
 
 router.post('/', verifyToken, requestsController.createRequest);
 
+router.get('/consumer', verifyToken, requestsController.getConsumerRequests);
+
 
 module.exports = router;
