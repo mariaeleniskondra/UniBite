@@ -13,7 +13,7 @@ const register = (req, res) => {
   }
 
   if (!email.endsWith('@upatras.gr') && !email.endsWith('.upatras.gr')) {
-    return res.status(400).json({ message: 'Eπιτρέπονται μόνο πανεπιστημιακά emails (@upatras.gr).' });
+    return res.status(400).json({ message: 'Επιτρέπονται μόνο πανεπιστημιακά emails (@upatras.gr).' });
   }
 
   db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
@@ -26,22 +26,19 @@ const register = (req, res) => {
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const cleanUsername = email.split('@')[0];
 
-    // Ενεργοποίηση των 5 credits απευθείας στην εγγραφή
     const insertQuery = `
-      INSERT INTO users (username, email, password_hash, role, credits) 
+      INSERT INTO users (username, email, password_hash, role, credits)
       VALUES (?, ?, ?, 'student', 5)
     `;
 
-    db.query(insertQuery, [cleanUsername, email, hashedPassword], (err) => {
-          if (err) {
-            console.error("MYSQL INSERT ERROR:", err);
-            return res.status(500).json({ message: 'Σφάλμα εγγραφής στη βάση δεδομένων' });
-          }
-          return res.status(201).json({ message: 'Εγγραφή επιτυχής! Παρακαλώ συνδεθείτε.' });
-        }
-    );
+    db.query(insertQuery, [username, email, hashedPassword], (err) => {
+      if (err) {
+        console.error("MYSQL INSERT ERROR:", err);
+        return res.status(500).json({ message: 'Σφάλμα εγγραφής στη βάση δεδομένων' });
+      }
+      return res.status(201).json({ message: 'Εγγραφή επιτυχής! Παρακαλώ συνδεθείτε.' });
+    });
   });
 };
 
@@ -50,6 +47,9 @@ const register = (req, res) => {
 // ========================================================
 const login = (req, res) => {
   const { email, password } = req.body;
+
+  console.log("=== ΔΟΚΙΜΗ LOGIN ===");
+  console.log("Email:", email);
 
   if (!email || !password) {
     return res.status(400).json({ message: 'Συμπληρώστε email και κωδικό' });
@@ -62,22 +62,32 @@ const login = (req, res) => {
     }
 
     if (results.length === 0) {
+      console.log("❌ Δεν βρέθηκε χρήστης με αυτό το email.");
       return res.status(401).json({ message: 'Λάθος email ή κωδικός πρόσβασης' });
     }
 
     const user = results[0];
-
     const isMatch = bcrypt.compareSync(password, user.password_hash);
+
+    console.log("Ταίριαξε ο κωδικός;", isMatch);
+
     if (!isMatch) {
+      console.log("❌ Λάθος κωδικός.");
       return res.status(401).json({ message: 'Λάθος email ή κωδικός πρόσβασης' });
     }
 
+    // Παραγωγή JWT Token
     const token = jwt.sign(
         { user_id: user.user_id, role: user.role, username: user.username },
         process.env.JWT_SECRET || 'unibite_secret_key_2026',
         { expiresIn: '24h' }
     );
 
+    console.log("✅ Επιτυχής σύνδεση ως:", user.role);
+
+    // Το frontend διαβάζει το role και κάνει redirect:
+    // admin   → admin.html
+    // student → cook_dashboard.html
     return res.json({
       token,
       role: user.role,
@@ -91,9 +101,9 @@ const login = (req, res) => {
 // 3. ΛΗΨΗ LIVE ΣΤΑΤΙΣΤΙΚΩΝ
 // ========================================================
 const getGlobalStats = (req, res) => {
-  const qPortions = `SELECT COUNT(*) AS total_meals FROM requests WHERE status = 'completed'`;
-  const qUsers = `SELECT COUNT(*) AS total_students FROM users WHERE role = 'student'`;
-  const qRatings = `SELECT AVG(rating_value) AS avg_rating FROM ratings`;
+  const qPortions = `SELECT COUNT(*) AS total_meals FROM requests WHERE is_delivered = 'received'`;
+  const qUsers    = `SELECT COUNT(*) AS total_students FROM users WHERE role = 'student'`;
+  const qRatings  = `SELECT AVG(rating_value) AS avg_rating FROM ratings`;
 
   db.query(qPortions, (err, resPortions) => {
     if (err) return res.status(500).json({ message: 'Σφάλμα στατιστικών μερίδων' });
@@ -108,9 +118,9 @@ const getGlobalStats = (req, res) => {
         avgRating = avgRating ? avgRating.toFixed(1) : "5.0";
 
         return res.json({
-          total_meals: resPortions[0].total_meals || 0,
+          total_meals:    resPortions[0].total_meals || 0,
           total_students: resUsers[0].total_students || 0,
-          avg_rating: avgRating
+          avg_rating:     avgRating
         });
       });
     });
@@ -118,7 +128,7 @@ const getGlobalStats = (req, res) => {
 };
 
 // ========================================================
-// 4. ΛΗΨΗ ΠΡΟΦΙΛ (ΓΙΑ ΤΟΥΣ ΠΟΝΤΟΥΣ)
+// 4. ΛΗΨΗ ΠΡΟΦΙΛ
 // ========================================================
 const getProfile = (req, res) => {
   const userId = req.user.user_id;
