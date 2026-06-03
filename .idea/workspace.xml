@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4583ae21-132c-470b-81f3-a791c54d2ea0" name="Changes" comment="Fix Log in" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="cook_dashboard" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;mariaeleniskondra&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/mariaeleniskondra/UniBite.git&quot;,
+    &quot;accountId&quot;: &quot;f0db9496-098f-4f10-becb-c1a350010821&quot;
+  }
+}</component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.242146972334415" />
+      <entry key="MS500" value="2.6497136555685765" />
+      <entry key="S2" value="4.890608458189471" />
+      <entry key="S5" value="5.981918631099547" />
+      <entry key="S10" value="6.455041361778624" />
+      <entry key="S30" value="6.809585454329836" />
+      <entry key="S60" value="6.903644549986582" />
+      <entry key="M2" value="6.95153108780972" />
+      <entry key="M5" value="6.980542012514545" />
+      <entry key="M10" value="6.990259224036736" />
+      <entry key="M15" value="6.993503527733255" />
+      <entry key="M30" value="6.996750459661804" />
+      <entry key="H1" value="6.998975737355466" />
+      <entry key="H2" value="7.181357743102064" />
+      <entry key="H4" value="10.553959319359718" />
+      <entry key="D1" value="58.88062005421436" />
+      <entry key="W1" value="91.6974927642574" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.1735969754465625" />
+      <entry key="MS500" value="2.618570789050421" />
+      <entry key="S2" value="4.872579621535471" />
+      <entry key="S5" value="5.9721008645762925" />
+      <entry key="S10" value="6.449526250885324" />
+      <entry key="S30" value="6.807591180054507" />
+      <entry key="S60" value="6.9026264379729465" />
+      <entry key="M2" value="6.9510166698706035" />
+      <entry key="M5" value="6.980334943049683" />
+      <entry key="M10" value="6.990155470958197" />
+      <entry key="M15" value="6.993434310396284" />
+      <entry key="M30" value="6.996715826659975" />
+      <entry key="H1" value="6.99895840242199" />
+      <entry key="H2" value="7.181346640383307" />
+      <entry key="H4" value="10.553928942589087" />
+      <entry key="D1" value="58.88055669204454" />
+      <entry key="W1" value="91.69747825248298" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3EYHhZxw95SuVPxdP6HDF4uZ2Kc" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Database Script.schema.sql.executor": "Run",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Node.js.server.js.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "log-in",
+    "ignore.virus.scanning.warn.message": "true",
+    "javascript.preferred.runtime.type.id": "node",
+    "last_opened_file_path": "C:/Projects/Semester_6/Web/unibite",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_interpreter_path": "C:/Users/milen/AppData/Roaming/JetBrains/WebStorm2026.1/node/versions/24.16.0/node",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\WebStorm 2026.1.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ],
+    "RunConfigurationTargetLRU": [
+      "b062fc73-60ea-45ed-86c3-dd462f5513d0"
+    ]
+  }
+}]]></component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="DatabaseScript" />
+      </set>
+    </option>
+    <option name="configurationStatuses">
+      <map>
+        <entry key="DatabaseScript">
+          <value>
+            <map>
+              <entry key="schema.sql" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="RunManager" selected="Node.js.server.js">
+    <configuration name="schema.sql" type="DatabaseScript" editBeforeRun="true" temporary="true" nameIsGenerated="true">
+      <script-file value="$PROJECT_DIR$/schema.sql" />
+      <script-mode>FILE</script-mode>
+      <data-source id="b062fc73-60ea-45ed-86c3-dd462f5513d0" />
+      <method v="2" />
+    </configuration>
+    <configuration name="server.js" type="NodeJSConfigurationType" temporary="true" path-to-node="$PROJECT_DIR$/../../../../Program Files/nodejs/node" nameIsGenerated="true" path-to-js-file="server.js" working-dir="$PROJECT_DIR$">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Node.js.server.js" />
+        <item itemvalue="Database Script.schema.sql" />
+        <item itemvalue="Node.js.server.js" />
+        <item itemvalue="Database Script.schema.sql" />
+        <item itemvalue="Node.js.server.js" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-WS-261.24374.125" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4583ae21-132c-470b-81f3-a791c54d2ea0" name="Changes" comment="" />
+      <created>1780348707801</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1780348707801</updated>
+      <workItem from="1780348708305" duration="2170000" />
+      <workItem from="1780350934462" duration="3675000" />
+      <workItem from="1780395959421" duration="20030000" />
+    </task>
+    <task id="LOCAL-00001" summary="Fix log in">
+      <option name="closed" value="true" />
+      <created>1780349343468</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1780349343468</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Fix log in">
+      <option name="closed" value="true" />
+      <created>1780350448009</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1780350448009</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Fix log in">
+      <option name="closed" value="true" />
+      <created>1780352801002</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1780352801002</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Fix cooker">
+      <option name="closed" value="true" />
+      <created>1780397917544</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1780397917544</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Fix edit">
+      <option name="closed" value="true" />
+      <created>1780398198011</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1780398198011</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Fix all things about cook">
+      <option name="closed" value="true" />
+      <created>1780401682097</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1780401682097</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Fix all things about cook">
+      <option name="closed" value="true" />
+      <created>1780427622346</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1780427622346</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Fix nikooo">
+      <option name="closed" value="true" />
+      <created>1780427921807</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1780427921807</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Fix Log in">
+      <option name="closed" value="true" />
+      <created>1780430869050</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1780430869050</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Fix Log in">
+      <option name="closed" value="true" />
+      <created>1780488841562</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1780488841562</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Fix log in" />
+    <MESSAGE value="Fix cooker" />
+    <MESSAGE value="Fix edit" />
+    <MESSAGE value="Fix all things about cook" />
+    <MESSAGE value="Fix nikooo" />
+    <MESSAGE value="Fix Log in" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix Log in" />
+  </component>
+</project>
