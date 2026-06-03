@@ -1,7 +1,7 @@
 const db = require('../models/db');
 
-// ===== 1. ΛΗΨΗ ΑΙΤΗΜΑΤΩΝ (GET) =====
-// Φέρνουμε ΟΛΑ τα αιτήματα (εκκρεμή και εγκεκριμένα που περιμένουν παράδοση)
+
+// Φέρνουμε ΟΛΑ τα αιτήματα
 const getCookRequests = (req, res) => {
     const cook_id = req.user.user_id;
 
@@ -12,7 +12,7 @@ const getCookRequests = (req, res) => {
         FROM requests r
                  JOIN listings l ON r.listing_id = l.listing_id
                  JOIN users u ON r.consumer_id = u.user_id
-        WHERE l.cook_id = ? AND r.status IN ('pending', 'approved') AND r.is_delivered = 0
+        WHERE l.cook_id = ? AND r.status IN ('pending', 'approved') AND r.is_delivered = 'pending'
         ORDER BY r.created_at DESC
     `;
 
@@ -23,8 +23,7 @@ const getCookRequests = (req, res) => {
 };
 
 
-// ===== 0. ΔΗΜΙΟΥΡΓΙΑ ΝΕΟΥ ΑΙΤΗΜΑΤΟΣ / ΚΡΑΤΗΣΗΣ (POST) =====
-// Αυτή είναι η λειτουργία που έλειπε και ζήτησε ο συνάδελφος!
+
 const createRequest = (req, res) => {
     const { listing_id } = req.body;
     const consumer_id = req.user.user_id; // Παίρνουμε το ID του φοιτητή από το JWT Token
@@ -107,6 +106,32 @@ const approveRequest = (req, res) => {
         });
     });
 };
+// ===== ΛΗΨΗ ΑΙΤΗΜΑΤΩΝ ΚΑΤΑΝΑΛΩΤΗ (GET) =====
+const getConsumerRequests = (req, res) => {
+    const consumer_id = req.user.user_id;
+
+    // ΝΕΟ QUERY: Φέρνει ΚΑΙ τη βαθμολογία (rating_value, comments) αν υπάρχει //left join gia na fernei aksiologisi an yparxei
+    const query = `
+        SELECT r.request_id, r.status, r.is_delivered, r.created_at,
+               l.title AS listing_title, l.pickup_location, l.pickup_time,
+               u.username AS cook_name,
+               rt.rating_value, rt.comments AS rating_comments
+        FROM requests r
+                 JOIN listings l ON r.listing_id = l.listing_id
+                 JOIN users u ON l.cook_id = u.user_id
+                 LEFT JOIN ratings rt ON r.request_id = rt.request_id  
+        WHERE r.consumer_id = ?
+        ORDER BY r.created_at DESC
+    `;
+
+    db.query(query, [consumer_id], (err, results) => {
+        if (err) {
+            console.error("Σφάλμα MySQL:", err);
+            return res.status(500).json({ message: 'Σφάλμα κατά τη λήψη των κρατήσεων' });
+        }
+        return res.json(results);
+    });
+};
 
 // ===== 3. ΑΠΟΡΡΙΨΗ ΑΙΤΗΜΑΤΟΣ (PUT) =====
 const rejectRequest = (req, res) => {
@@ -122,7 +147,7 @@ const confirmDelivery = (req, res) => {
     const request_id = req.params.id;
 
     // Σημειώνουμε ότι παραλήφθηκε επιτυχώς
-    db.query('UPDATE requests SET is_delivered = 1, status = "completed" WHERE request_id = ?', [request_id], (err) => {
+    db.query('UPDATE requests SET is_delivered = "received" WHERE request_id = ?', [request_id], (err) => {
         if (err) return res.status(500).json({ message: 'Σφάλμα κατά την επιβεβαίωση' });
         return res.json({ message: 'Η μερίδα παραδόθηκε επιτυχώς! 📦' });
     });
@@ -163,4 +188,4 @@ const noShowRequest = (req, res) => {
     });
 };
 
-module.exports = { createRequest, getCookRequests, approveRequest, rejectRequest, confirmDelivery, noShowRequest };
+module.exports = { createRequest, getCookRequests, getConsumerRequests, approveRequest, rejectRequest, confirmDelivery, noShowRequest };
