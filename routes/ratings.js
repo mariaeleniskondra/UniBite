@@ -3,5 +3,6 @@ const router = express.Router();
 const ratingController = require('../controllers/ratingController');//sindesi me controller
 
 router.post('/', ratingController.createRating);
+router.get('/apply-penalties', ratingController.applyMissingRatingPenalties);
 
 module.exports = router;

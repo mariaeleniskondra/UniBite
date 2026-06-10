@@ -99,4 +99,41 @@ INSERT INTO users (username, email, password_hash, role, credits) VALUES
                                                                       ('admin_panos', 'admin1@upatras.gr',   '$2b$10$VrZvZXdHiKz79fIv0tfuZuNi09JEGJixuoKeM1U08UwuIxn.lbxQa', 'admin',   0),
                                                                       ('admin_anna',  'admin2@upatras.gr',   '$2b$10$VrZvZXdHiKz79fIv0tfuZuNi09JEGJixuoKeM1U08UwuIxn.lbxQa', 'admin',   0);
 
+-- ============================================================
+-- ΑΓΓΕΛΙΕΣ
+-- listing_id 1,2,3 → active
+-- listing_id 4     → inactive (0 μερίδες, γκριζαρισμένη στο feed)
+-- listing_id 5     → deleted  (για στατιστικά admin)
+-- ============================================================
+INSERT INTO listings (cook_id, title, description, total_portions, available_portions, pickup_location, pickup_time, status) VALUES
 
+                                                                                                                                 (3, 'Φακές βελουτέ',         'Σούπα φακές με καρότο και σέλινο.',       3, 0, 'Φοιτητική Εστία Α',             '13:00 - 14:00', 'inactive'),
+                                                                                                                                 (4, 'Μακαρόνια με κιμά',     'Σπαγγέτι με φρέσκο μοσχαρίσιο κιμά.',    6, 3, 'Πλατεία Όλγας',                 '15:00 - 16:00', 'deleted');
+
+ALTER TABLE requests ADD COLUMN penalty_applied TINYINT(1) DEFAULT 0;
+
+-- ============================================================
+-- ΑΙΤΗΜΑΤΑ — όλα με listing_id που υπάρχουν (1,2,3,4,5)
+-- ============================================================
+INSERT INTO requests (listing_id, consumer_id, status, is_delivered) VALUES
+                                                                         (1, 2, 'approved', 'received'),
+                                                                         (1, 3, 'approved', 'received'),
+                                                                         (1, 4, 'approved', 'received'),
+                                                                         (2, 5, 'approved', 'received'),
+                                                                         (2, 2, 'approved', 'received'),
+                                                                         (3, 1, 'approved', 'received'),
+                                                                         (3, 3, 'approved', 'received'),
+                                                                         (5, 5, 'approved', 'received');
+
+-- ============================================================
+-- ΑΞΙΟΛΟΓΗΣΕΙΣ
+-- ============================================================
+INSERT INTO ratings (request_id, rating_value, comments) VALUES
+                                                             (1, 5, 'Τέλειο!'),
+                                                             (2, 5, 'Η καλύτερη μπεσαμέλ.'),
+                                                             (3, 5, 'Πολύ χορταστικό.'),
+                                                             (4, 4, 'Πολύ καλό.'),
+                                                             (5, 5, 'Νόστιμο και σπιτικό.'),
+                                                             (6, 4, 'Ωραία γεμιστά.'),
+                                                             (7, 4, 'Μια χαρά φαγητό.'),
+                                                             (8, 3, 'Λίγο κρύο αλλά γευστικό.');
