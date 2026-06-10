@@ -78,7 +78,9 @@ const approveRequest = (req, res) => {
             db.query('SELECT available_portions FROM listings WHERE listing_id = ?', [listing_id], (err, listingResults) => {
                 if (err || listingResults.length === 0) return db.rollback(() => res.status(500).json({ message: 'Το φαγητό δεν βρέθηκε' }));
 
-                if (listingResults[0].available_portions <= 0) {
+                const current_portions = listingResults[0].available_portions;
+
+                if (current_portions <= 0) {
                     return db.rollback(() => res.status(400).json({ message: 'Το φαγητό εξαντλήθηκε!' }));
                 }
 
@@ -89,10 +91,26 @@ const approveRequest = (req, res) => {
                     db.query('UPDATE listings SET available_portions = available_portions - 1 WHERE listing_id = ?', [listing_id], (err) => {
                         if (err) return db.rollback(() => res.status(500).json({ message: 'Αποτυχία ενημέρωσης μερίδων' }));
 
-                        db.commit((err) => {
-                            if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα commit' }));
-                            return res.json({ message: 'Το αίτημα εγκρίθηκε!' });
-                        });
+                        // ===== ΕΔΩ ΜΠΑΙΝΕΙ Η ΠΡΟΣΘΗΚΗ ΓΙΑ ΤΟ INACTIVE =====
+                        // Αν οι μερίδες που μένουν τώρα είναι 0 (δηλαδή πριν τη μείωση ήταν 1)
+                        if (current_portions - 1 === 0) {
+                            db.query('UPDATE listings SET status = "inactive" WHERE listing_id = ?', [listing_id], (err) => {
+                                if (err) return db.rollback(() => res.status(500).json({ message: 'Αποτυχία αλλαγής κατάστασης σε ανενεργή' }));
+
+                                // Commit αφού έγινε και η αλλαγή σε inactive
+                                db.commit((err) => {
+                                    if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα commit' }));
+                                    return res.json({ message: 'Το αίτημα εγκρίθηκε και η αγγελία έγινε Ανενεργή (0 μερίδες)!' });
+                                });
+                            });
+                        } else {
+                            // Αν υπάρχουν ακόμα μερίδες (> 0), προχωράμε στο κανονικό commit
+                            db.commit((err) => {
+                                if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα commit' }));
+                                return res.json({ message: 'Το αίτημα εγκρίθηκε!' });
+                            });
+                        }
+                        // ==================================================
                     });
                 });
             });
@@ -120,28 +138,37 @@ const confirmDelivery = (req, res) => {
     db.beginTransaction((err) => {
         if (err) return res.status(500).json({ message: 'Σφάλμα συναλλαγής' });
 
-        const findCookQuery = `
-            SELECT l.cook_id 
+        // Φέρνουμε και τον cook_id ΚΑΙ τον consumer_id
+        const findUsersQuery = `
+            SELECT l.cook_id, r.consumer_id
             FROM requests r
-            JOIN listings l ON r.listing_id = l.listing_id
+                     JOIN listings l ON r.listing_id = l.listing_id
             WHERE r.request_id = ?
         `;
 
-        db.query(findCookQuery, [request_id], (err, results) => {
-            if (err || results.length === 0) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα εύρεσης μάγειρα' }));
-            const cook_id = results[0].cook_id;
+        db.query(findUsersQuery, [request_id], (err, results) => {
+            if (err || results.length === 0) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα εύρεσης χρηστών' }));
 
-            // Σημειώνουμε is_delivered = received
+            const cook_id = results[0].cook_id;
+            const consumer_id = results[0].consumer_id; // Πήραμε το ID του καταναλωτή
+
+            // 1. Σημειώνουμε is_delivered = received
             db.query('UPDATE requests SET is_delivered = "received" WHERE request_id = ?', [request_id], (err) => {
                 if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα επιβεβαίωσης' }));
 
-                // +1 πόντος στον μάγειρα (Β4: 1 μερίδα = 1 πόντος)
+                // 2. +1 πόντος στον μάγειρα
                 db.query('UPDATE users SET credits = credits + 1 WHERE user_id = ?', [cook_id], (err) => {
                     if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα ενημέρωσης πόντων μάγειρα' }));
 
-                    db.commit((err) => {
-                        if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα commit' }));
-                        return res.json({ message: 'Η παράδοση καταγράφηκε! +1 πόντος στον μάγειρα 📦' });
+                    // 3. -1 πόντος από τον καταναλωτή (Αυτό που ζήτησες)
+                    db.query('UPDATE users SET credits = credits - 1 WHERE user_id = ?', [consumer_id], (err) => {
+                        if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα μείωσης πόντων καταναλωτή' }));
+
+                        // Ολοκλήρωση της συναλλαγής
+                        db.commit((err) => {
+                            if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα commit' }));
+                            return res.json({ message: 'Η παράδοση καταγράφηκε! +1 πόντος στον μάγειρα, -1 στον καταναλωτή 📦' });
+                        });
                     });
                 });
             });
