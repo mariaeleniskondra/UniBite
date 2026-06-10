@@ -161,3 +161,9 @@ function submitRating() {
             alert('Σφάλμα: ' + error.message);
         });
 }
+
+// Έλεγχος και επιβολή ποινών 48 ωρών στο background
+fetch('/api/ratings/apply-penalties')
+    .then(res => res.json())
+    .then(data => console.log('Έλεγχος Ποινών:', data.message))
+    .catch(err => console.error('Σφάλμα ελέγχου ποινών:', err));
