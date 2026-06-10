@@ -284,6 +284,9 @@ body {
     flex-direction: column; /* Στα κινητά τα Tabs μπαίνουν το ένα κάτω από το άλλο */
   }
 }
+#consumerRequestsContainer .meal-card {
+  height: auto;
+}
 
 /* =========================================
    8. ADMIN DASHBOARD
