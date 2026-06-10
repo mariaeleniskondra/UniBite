@@ -173,18 +173,84 @@ body {
 }
 
 /* =========================================
-   5. RESPONSIVE MEDIA QUERIES
+   5. HAMBURGER MENU & RESPONSIVE
 ========================================= */
+
+/* Hamburger button — κρυμμένο σε desktop */
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+.hamburger-btn span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Animation: ☰ → ✕ */
+.hamburger-btn.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburger-btn.open span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger-btn.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile μόνο: ≤ 480px */
+@media (max-width: 480px) {
+  .hamburger-btn {
+    display: flex;
+  }
+
+  .nav-actions {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 6px;
+    padding: 12px 0 4px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .nav-actions.open {
+    display: flex;
+  }
+
+  .nav-btn {
+    font-size: 14px;
+    padding: 10px 14px;
+    text-align: left;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+
+  .nav-btn.active {
+    background: #fff;
+    color: var(--purple);
+  }
+
+  .page-title {
+    font-size: 28px;
+  }
+}
+
 @media (max-width: 991px) {
   .left-pane, .right-pane {
     min-height: auto;
     padding: 3rem 1.5rem;
   }
 }
-@media (max-width: 768px) {
-  .nav-actions { display: none; /* Κρύβουμε τα κουμπιά σε πολύ μικρές οθόνες για συντομία, θέλει burger menu κανονικά */ }
-  .page-title { font-size: 28px; }
-}
+
 /* =========================================
    6. ΟΘΟΝΗ ΑΝΕΒΑΣΜΑΤΟΣ ΑΓΓΕΛΙΑΣ
 ========================================= */
@@ -196,7 +262,6 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
-/* Κοινό στυλ για Inputs, Selects και Textareas μέσα στη φόρμα */
 .app-input {
   border: 1px solid #e1e1e1;
   border-radius: 8px;
@@ -208,14 +273,12 @@ body {
   transition: all 0.2s;
 }
 
-/* Εφέ όταν ο χρήστης γράφει σε ένα πεδίο (Μωβ χρώματα) */
 .app-input:focus {
   border-color: var(--purple);
   outline: none;
   box-shadow: 0 0 0 3px var(--light-purple);
 }
 
-/* Προσαρμογή των Checkboxes στα χρώματα του UniBite */
 .custom-checkbox:checked {
   background-color: var(--purple);
   border-color: var(--purple);
@@ -225,12 +288,12 @@ body {
   border-color: var(--purple);
 }
 
-/* Μικρή ρύθμιση padding για κινητά μέσα στην κάρτα */
 @media (max-width: 576px) {
   .form-card {
     padding: 20px;
   }
 }
+
 /* =========================================
    7. ΠΡΟΦΙΛ - HEADER & TABS
 ========================================= */
@@ -242,7 +305,6 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
-/* Στυλ για τα Tabs Εναλλαγής */
 .custom-tabs {
   display: flex;
   gap: 10px;
@@ -263,7 +325,6 @@ body {
 .custom-tabs .nav-link:hover {
   border-color: #d6c8ff;
 }
-/* Το ενεργό (πατημένο) Tab */
 .custom-tabs .nav-link.active {
   background: var(--light-purple);
   color: var(--deep-purple);
@@ -271,7 +332,6 @@ body {
   box-shadow: none;
 }
 
-/* Ειδικά κουτιά μέσα στις κάρτες (Αιτήματα & Αξιολογήσεις) */
 .request-box, .rating-box {
   background: #fafafc;
   border: 1px solid var(--border);
@@ -281,9 +341,10 @@ body {
 
 @media (max-width: 576px) {
   .custom-tabs {
-    flex-direction: column; /* Στα κινητά τα Tabs μπαίνουν το ένα κάτω από το άλλο */
+    flex-direction: column;
   }
 }
+
 #consumerRequestsContainer .meal-card {
   height: auto;
 }
