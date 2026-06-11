@@ -187,7 +187,7 @@ const noShowRequest = (req, res) => {
     db.beginTransaction((err) => {
         if (err) return res.status(500).json({ message: 'Σφάλμα συναλλαγής' });
 
-        db.query('SELECT consumer_id, listing_id FROM requests WHERE request_id = ?', [request_id], (err, results) => {
+        db.query('SELECT consumer_id, listing_id FROM requests WHERE request_id = ?', [request_id],    (err, results) => {
             if (err || results.length === 0) return db.rollback(() => res.status(500).json({ message: 'Το αίτημα δεν βρέθηκε' }));
             const { consumer_id, listing_id } = results[0];
 

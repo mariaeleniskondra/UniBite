@@ -45,23 +45,21 @@ function fetchConsumerRequests() {
 
             requests.forEach(req => {
                 let statusBadge = '';
-                if (req.status === 'pending')   statusBadge = '<span class="badge bg-warning text-dark">Εκκρεμεί Έγκριση ⏳</span>';
-                else if (req.status === 'approved') statusBadge = '<span class="badge bg-success">Εγκρίθηκε! ✅</span>';
-                else if (req.status === 'rejected') statusBadge = '<span class="badge bg-danger">Απορρίφθηκε ❌</span>';
-                else if (req.status === 'no_show') statusBadge = '<span class="badge bg-secondary">Δεν παραλάβατε (No-Show)</span>';
+                if (req.status === 'pending')        statusBadge = '<span class="badge bg-warning text-dark">Εκκρεμεί Έγκριση ⏳</span>';
+                else if (req.status === 'approved')  statusBadge = '<span class="badge bg-success">Εγκρίθηκε! ✅</span>';
+                else if (req.status === 'rejected')  statusBadge = '<span class="badge bg-danger">Απορρίφθηκε ❌</span>';
+                else if (req.status === 'no_show')   statusBadge = '<span class="badge bg-secondary">Δεν παραλάβατε (No-Show)</span>';
 
                 // --- Κουτί Αξιολόγησης (Δυναμικό) ---
                 let ratingHTML = '';
 
                 if (req.status === 'approved' && req.is_delivered === 'received') {
-
+                    // Παραλήφθηκε — έλεγχος αν υπάρχει αξιολόγηση
                     if (req.rating_value) {
-                        // Υπάρχει ήδη αξιολόγηση — εμφάνισε την
                         let stars = '⭐'.repeat(req.rating_value);
                         let commentText = req.rating_comments
                             ? `<p class="small text-muted mt-2 mb-0"><em>"${req.rating_comments}"</em></p>`
                             : '';
-
                         ratingHTML = `
                             <div class="rating-box mt-3 p-3 bg-light rounded border border-success">
                                 <h6 class="fw-bold mb-1 text-success">Η αξιολόγησή σας υποβλήθηκε ✅</h6>
@@ -70,7 +68,6 @@ function fetchConsumerRequests() {
                             </div>
                         `;
                     } else {
-                        // Παραλήφθηκε αλλά δεν έχει αξιολογηθεί — εμφάνισε κουμπί
                         ratingHTML = `
                             <div class="rating-box text-center mt-3 p-3 bg-light rounded border border-warning">
                                 <h6 class="fw-bold mb-1">Παραλάβατε το φαγητό;</h6>
@@ -82,15 +79,23 @@ function fetchConsumerRequests() {
                         `;
                     }
 
-                } else if (req.status === 'approved' && req.is_delivered !== 'received') {
-                    // Εγκρίθηκε αλλά δεν έχει παραληφθεί/επιβεβαιωθεί ακόμα — ΟΧΙ κενό κουτί
+                } else if (req.status === 'approved' && req.is_delivered === 'no_show') {
+                    // Ο μάγειρας κατέγραψε No-Show
+                    ratingHTML = `
+                        <div class="mt-3 p-2 rounded border border-danger-subtle small d-flex align-items-center gap-2" style="background:#fff5f5; color:#b91c1c;">
+                            ❌ Δεν παραλάβατε το φαγητό (No-Show) — αφαιρέθηκε 1 πόντος
+                        </div>
+                    `;
+
+                } else if (req.status === 'approved' && req.is_delivered === 'pending') {
+                    // Εγκρίθηκε, αναμένεται παράδοση
                     ratingHTML = `
                         <div class="mt-3 p-2 rounded border border-secondary-subtle text-muted small d-flex align-items-center gap-2" style="background:#f8f9fa;">
                             ⏳ Αναμένεται επιβεβαίωση παράδοσης
                         </div>
                     `;
                 }
-                // Για pending / rejected / no_show: ratingHTML παραμένει '' (κανένα κουτί)
+                // Για pending / rejected: ratingHTML μένει '' (κανένα κουτί)
 
                 const card = `
                     <div class="meal-card border rounded p-3 mb-3 shadow-sm bg-white">
@@ -126,10 +131,10 @@ function openRatingModal(requestId) {
 
 // Υποβάλλει την Αξιολόγηση
 function submitRating() {
-    const requestId  = document.getElementById('ratingRequestId').value;
+    const requestId   = document.getElementById('ratingRequestId').value;
     const ratingValue = document.getElementById('ratingValue').value;
-    const comments   = document.getElementById('ratingComments').value;
-    const token      = localStorage.getItem('token');
+    const comments    = document.getElementById('ratingComments').value;
+    const token       = localStorage.getItem('token');
 
     fetch('/api/ratings', {
         method: 'POST',
@@ -155,15 +160,9 @@ function submitRating() {
             const modalInstance = bootstrap.Modal.getInstance(modalElement);
             modalInstance.hide();
 
-            fetchConsumerRequests(); // Ξαναφόρτωσε για να εμφανιστεί η αξιολόγηση
+            fetchConsumerRequests();
         })
         .catch(error => {
             alert('Σφάλμα: ' + error.message);
         });
 }
-
-// Έλεγχος και επιβολή ποινών 48 ωρών στο background
-fetch('/api/ratings/apply-penalties')
-    .then(res => res.json())
-    .then(data => console.log('Έλεγχος Ποινών:', data.message))
-    .catch(err => console.error('Σφάλμα ελέγχου ποινών:', err));
