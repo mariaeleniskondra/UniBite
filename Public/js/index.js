@@ -19,6 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
     initMap();
     fetchAvailableMeals();
 
+    const userRole = localStorage.getItem('role');
+    const adminBtn = document.getElementById('adminDashboardBtn');
+
+    // Αν ο χρήστης είναι admin, κάνε το κουμπί ορατό!
+    if (userRole === 'admin' && adminBtn) {
+        adminBtn.style.display = 'inline-block'; // ή 'block' ανάλογα με το CSS σου
+    }
+
     const getLocationBtn = document.getElementById('getLocationBtn');
     if (getLocationBtn) {
         getLocationBtn.addEventListener('click', () => {
