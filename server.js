@@ -5,6 +5,7 @@ const path = require('path');
 const app = express();
 
 const requestRoutes = require('./routes/requests');
+const { runMissingRatingPenalties } = require('./controllers/ratingController');
 
 require('./models/db');
 
@@ -30,3 +31,13 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server τρέχει στο http://localhost:${PORT}`);
 });
+
+// Ωριαίος έλεγχος για το 48ωρο penalty αξιολόγησης (Γ3 εκφώνησης) —
+// χωρίς αυτό, η ποινή δεν εφαρμόζεται ποτέ αυτόματα, μόνο μέσω χειροκίνητου GET.
+const ONE_HOUR_MS = 60 * 60 * 1000;
+setInterval(() => {
+  runMissingRatingPenalties((err, penalizedCount) => {
+    if (err) console.error('Σφάλμα ελέγχου 48ωρου penalty:', err);
+    else if (penalizedCount > 0) console.log(`Εφαρμόστηκε ποινή -1 πόντου σε ${penalizedCount} χρήστη/ες.`);
+  });
+}, ONE_HOUR_MS);

@@ -74,54 +74,68 @@ const createRating = (req, res) => {
     });
 };
 
-const applyMissingRatingPenalties = (req, res) => {
-
+// Πυρήνας του ελέγχου 48ωρου penalty, ξεχωριστά από τον Express handler ώστε να καλείται
+// και από τον χρονοδιακόπτη στο server.js (Issue #3), όχι μόνο χειροκίνητα μέσω route.
+// Υπολογίζει τις 48 ώρες από την ΠΑΡΑΛΑΒΗ (delivered_at), όχι από τη δημιουργία του αιτήματος (Issue #8).
+function runMissingRatingPenalties(callback) {
     const findPenaltiesQuery = `
         SELECT r.request_id, r.consumer_id
         FROM requests r
         LEFT JOIN ratings rat ON r.request_id = rat.request_id
         WHERE r.is_delivered = 'received'
+          AND r.delivered_at IS NOT NULL
           AND rat.rating_id IS NULL
           AND r.penalty_applied = 0
-          AND TIMESTAMPDIFF(HOUR, r.created_at, NOW()) >= 48
+          AND TIMESTAMPDIFF(HOUR, r.delivered_at, NOW()) >= 48
     `;
 
     db.query(findPenaltiesQuery, (err, results) => {
-        if (err) return res.status(500).json({ error: 'Σφάλμα αναζήτησης ποινών.' });
+        if (err) return callback(err);
 
         if (results.length === 0) {
-            return res.status(200).json({ message: 'Δεν βρέθηκαν νέοι παραβάτες για ποινή 48 ωρών.' });
+            return callback(null, 0);
         }
 
         db.beginTransaction((err) => {
-            if (err) return res.status(500).json({ error: 'Σφάλμα εκκίνησης transaction' });
+            if (err) return callback(err);
 
             const userIdsToPenalize = results.map(row => row.consumer_id);
             const requestIdsMarked = results.map(row => row.request_id);
 
-            // 2. Αφαιρούμε 1 πόντο (χρησιμοποιώ GREATEST για να μην πάει σε αρνητικό νούμερο, π.χ. -1)
+            // Αφαιρούμε 1 πόντο (χρησιμοποιώ GREATEST για να μην πάει σε αρνητικό νούμερο, π.χ. -1)
             const deductCreditsQuery = `UPDATE users SET credits = GREATEST(0, credits - 1) WHERE user_id IN (?)`;
 
             db.query(deductCreditsQuery, [userIdsToPenalize], (err) => {
-                if (err) return db.rollback(() => res.status(500).json({ error: 'Σφάλμα αφαίρεσης πόντων' }));
+                if (err) return db.rollback(() => callback(err));
 
-                // 3. Μαρκάρουμε τα requests ότι πήραν την ποινή
+                // Μαρκάρουμε τα requests ότι πήραν την ποινή
                 const markRequestsQuery = `UPDATE requests SET penalty_applied = 1 WHERE request_id IN (?)`;
 
                 db.query(markRequestsQuery, [requestIdsMarked], (err) => {
-                    if (err) return db.rollback(() => res.status(500).json({ error: 'Σφάλμα ενημέρωσης requests' }));
+                    if (err) return db.rollback(() => callback(err));
 
-                    // Ολοκλήρωση
                     db.commit((err) => {
-                        if (err) return db.rollback(() => res.status(500).json({ error: 'Σφάλμα commit' }));
-                        return res.status(200).json({
-                            message: `Επιβλήθηκε ποινή -1 πόντου σε ${results.length} παραβάτες.`
-                        });
+                        if (err) return db.rollback(() => callback(err));
+                        return callback(null, results.length);
                     });
                 });
             });
         });
     });
+}
+
+const applyMissingRatingPenalties = (req, res) => {
+    runMissingRatingPenalties((err, penalizedCount) => {
+        if (err) return res.status(500).json({ error: 'Σφάλμα εφαρμογής ποινών.' });
+
+        if (penalizedCount === 0) {
+            return res.status(200).json({ message: 'Δεν βρέθηκαν νέοι παραβάτες για ποινή 48 ωρών.' });
+        }
+
+        return res.status(200).json({
+            message: `Επιβλήθηκε ποινή -1 πόντου σε ${penalizedCount} παραβάτες.`
+        });
+    });
 };
 
-module.exports = { createRating ,applyMissingRatingPenalties };
+module.exports = { createRating, applyMissingRatingPenalties, runMissingRatingPenalties };

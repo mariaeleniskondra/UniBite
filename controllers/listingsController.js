@@ -61,23 +61,36 @@ const createListing = (req, res) => {
 const getCookListings = (req, res) => {
     const cook_id = req.user.user_id;
 
-    // ΔΙΟΡΘΩΣΗ: Προσθήκη GROUP_CONCAT για να εμφανίζονται live τα αλλεργιογόνα στο dashboard
-    const query = `
-        SELECT l.*, GROUP_CONCAT(a.name SEPARATOR ', ') AS allergens_list
-        FROM listings l
-                 LEFT JOIN listing_allergens la ON l.listing_id = la.listing_id
-                 LEFT JOIN allergens a ON la.allergen_id = a.allergen_id
-        WHERE l.cook_id = ? AND l.status != 'deleted'
-        GROUP BY l.listing_id
-        ORDER BY l.created_at DESC
+    // Αυτόματο update — αγγελίες > 48 ωρών γίνονται 'deleted' (ίδιος έλεγχος με το public feed
+    // στο routes/meals.js, ώστε το dashboard του μάγειρα να μη δείχνει ληγμένες αγγελίες, Issue #4)
+    const autoDeleteQuery = `
+        UPDATE listings
+        SET status = 'deleted'
+        WHERE status != 'deleted'
+        AND TIMESTAMPDIFF(HOUR, created_at, NOW()) >= 48
     `;
 
-    db.query(query, [cook_id], (err, results) => {
-        if (err) {
-            console.error("MYSQL GET COOK LISTINGS ERROR:", err);
-            return res.status(500).json({ message: 'Σφάλμα κατά τη λήψη των αγγελιών' });
-        }
-        return res.json(results);
+    db.query(autoDeleteQuery, (err) => {
+        if (err) console.error('Auto-delete error:', err);
+
+        // ΔΙΟΡΘΩΣΗ: Προσθήκη GROUP_CONCAT για να εμφανίζονται live τα αλλεργιογόνα στο dashboard
+        const query = `
+            SELECT l.*, GROUP_CONCAT(a.name SEPARATOR ', ') AS allergens_list
+            FROM listings l
+                     LEFT JOIN listing_allergens la ON l.listing_id = la.listing_id
+                     LEFT JOIN allergens a ON la.allergen_id = a.allergen_id
+            WHERE l.cook_id = ? AND l.status != 'deleted'
+            GROUP BY l.listing_id
+            ORDER BY l.created_at DESC
+        `;
+
+        db.query(query, [cook_id], (err, results) => {
+            if (err) {
+                console.error("MYSQL GET COOK LISTINGS ERROR:", err);
+                return res.status(500).json({ message: 'Σφάλμα κατά τη λήψη των αγγελιών' });
+            }
+            return res.json(results);
+        });
     });
 };
 
@@ -102,35 +115,50 @@ const updateListing = (req, res) => {
     const listing_id = req.params.id;
     const { title, description, total_portions, pickup_location, pickup_time, allergens } = req.body;
 
-    let queryUpdate = '';
-    let queryParams = [];
     let parsedAllergens = [];
-
     if (allergens) {
         try { parsedAllergens = typeof allergens === 'string' ? JSON.parse(allergens) : allergens; } catch(e) { parsedAllergens = []; }
     }
 
-    if (req.file) {
-        const image_url = `/uploads/${req.file.filename}`;
-        queryUpdate = `UPDATE listings SET title=?, description=?, image_url=?, total_portions=?, available_portions=?, pickup_location=?, pickup_time=? WHERE listing_id=?`;
-        queryParams = [title, description, image_url, total_portions, total_portions, pickup_location, pickup_time, listing_id];
-    } else {
-        queryUpdate = `UPDATE listings SET title=?, description=?, total_portions=?, available_portions=?, pickup_location=?, pickup_time=? WHERE listing_id=?`;
-        queryParams = [title, description, total_portions, total_portions, pickup_location, pickup_time, listing_id];
-    }
+    // Φέρνουμε πρώτα την τρέχουσα αγγελία για να υπολογίσουμε τη διαφορά στις μερίδες
+    // αντί να τις μηδενίζουμε (βλ. Issue #1 στο review)
+    db.query('SELECT total_portions, available_portions, status FROM listings WHERE listing_id = ?', [listing_id], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Σφάλμα κατά την ανάκτηση της αγγελίας.' });
+        if (results.length === 0) return res.status(404).json({ message: 'Η αγγελία δεν βρέθηκε.' });
 
-    db.query(queryUpdate, queryParams, (err) => {
-        if (err) return res.status(500).json({ message: 'Αποτυχία ενημέρωσης αγγελίας.' });
+        const newTotal = parseInt(total_portions, 10);
+        if (isNaN(newTotal)) return res.status(400).json({ message: 'Οι μερίδες πρέπει να είναι αριθμός.' });
 
-        db.query('DELETE FROM listing_allergens WHERE listing_id = ?', [listing_id], (err) => {
-            if (parsedAllergens && parsedAllergens.length > 0) {
-                const allergenValues = parsedAllergens.map(allergenId => [listing_id, allergenId]);
-                db.query('INSERT INTO listing_allergens (listing_id, allergen_id) VALUES ?', [allergenValues], () => {
+        const { total_portions: oldTotal, available_portions: oldAvailable, status: oldStatus } = results[0];
+        const delta = newTotal - oldTotal;
+        const newAvailable = Math.max(0, Math.min(newTotal, oldAvailable + delta));
+        const newStatus = oldStatus === 'deleted' ? oldStatus : (newAvailable > 0 ? 'active' : 'inactive');
+
+        let queryUpdate = '';
+        let queryParams = [];
+
+        if (req.file) {
+            const image_url = `/uploads/${req.file.filename}`;
+            queryUpdate = `UPDATE listings SET title=?, description=?, image_url=?, total_portions=?, available_portions=?, pickup_location=?, pickup_time=?, status=? WHERE listing_id=?`;
+            queryParams = [title, description, image_url, newTotal, newAvailable, pickup_location, pickup_time, newStatus, listing_id];
+        } else {
+            queryUpdate = `UPDATE listings SET title=?, description=?, total_portions=?, available_portions=?, pickup_location=?, pickup_time=?, status=? WHERE listing_id=?`;
+            queryParams = [title, description, newTotal, newAvailable, pickup_location, pickup_time, newStatus, listing_id];
+        }
+
+        db.query(queryUpdate, queryParams, (err) => {
+            if (err) return res.status(500).json({ message: 'Αποτυχία ενημέρωσης αγγελίας.' });
+
+            db.query('DELETE FROM listing_allergens WHERE listing_id = ?', [listing_id], (err) => {
+                if (parsedAllergens && parsedAllergens.length > 0) {
+                    const allergenValues = parsedAllergens.map(allergenId => [listing_id, allergenId]);
+                    db.query('INSERT INTO listing_allergens (listing_id, allergen_id) VALUES ?', [allergenValues], () => {
+                        return res.json({ message: 'Η αγγελία ενημερώθηκε επιτυχώς!' });
+                    });
+                } else {
                     return res.json({ message: 'Η αγγελία ενημερώθηκε επιτυχώς!' });
-                });
-            } else {
-                return res.json({ message: 'Η αγγελία ενημερώθηκε επιτυχώς!' });
-            }
+                }
+            });
         });
     });
 };

@@ -152,8 +152,8 @@ const confirmDelivery = (req, res) => {
             const cook_id = results[0].cook_id;
             const consumer_id = results[0].consumer_id; // Πήραμε το ID του καταναλωτή
 
-            // 1. Σημειώνουμε is_delivered = received
-            db.query('UPDATE requests SET is_delivered = "received" WHERE request_id = ?', [request_id], (err) => {
+            // 1. Σημειώνουμε is_delivered = received + delivered_at (χρησιμοποιείται για το 48ωρο penalty αξιολόγησης)
+            db.query('UPDATE requests SET is_delivered = "received", delivered_at = NOW() WHERE request_id = ?', [request_id], (err) => {
                 if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα επιβεβαίωσης' }));
 
                 // 2. +1 πόντος στον μάγειρα
@@ -199,8 +199,8 @@ const noShowRequest = (req, res) => {
                 db.query('UPDATE listings SET available_portions = available_portions + 1 WHERE listing_id = ?', [listing_id], (err) => {
                     if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα επιστροφής μερίδας' }));
 
-                    // -1 πόντος από τον καταναλωτή που δεν ήρθε (Β3)
-                    db.query('UPDATE users SET credits = credits - 1 WHERE user_id = ?', [consumer_id], (err) => {
+                    // -1 πόντος από τον καταναλωτή που δεν ήρθε (Β3), χωρίς να πάει σε αρνητικό
+                    db.query('UPDATE users SET credits = GREATEST(0, credits - 1) WHERE user_id = ?', [consumer_id], (err) => {
                         if (err) return db.rollback(() => res.status(500).json({ message: 'Σφάλμα μείωσης πόντων' }));
 
                         db.commit((err) => {

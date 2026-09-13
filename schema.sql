@@ -64,6 +64,7 @@ CREATE TABLE requests (
                           status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
                           is_delivered ENUM('pending', 'received', 'no_show') DEFAULT 'pending',
                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          delivered_at TIMESTAMP NULL DEFAULT NULL,
                           FOREIGN KEY (listing_id) REFERENCES listings(listing_id) ON DELETE CASCADE,
                           FOREIGN KEY (consumer_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
